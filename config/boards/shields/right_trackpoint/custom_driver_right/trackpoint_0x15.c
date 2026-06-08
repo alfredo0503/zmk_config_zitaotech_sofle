@@ -338,6 +338,7 @@ static void trackpoint_work_cb(struct k_work *work) {
         process_arrow_axis(dev, dy, &data->arrow_residue_y,
                            INPUT_BTN_2,  // 上
                            INPUT_BTN_3); // 下
+        k_msleep(16);
     } else if (scroll_key_pressed) {
 
         if (just_enter_scroll) {
