@@ -7,5 +7,5 @@
 # Keymap for FirmwareV2.0
 
 <p align="center">
-<img width="800"  src="https://github.com/DZT970525/zmk_config_zitaotech_sofle/blob/main/firmwareV2.0/zitaotech_sofle_keymapV2.0.svg"/>
+<img width="800"  src="https://github.com/DZT970525/zmk_config_zitaotech_sofle/blob/main/firmwareV2.0/zitaotech_soflekeymap_firmwareV2.0.png"/>
 </p>
