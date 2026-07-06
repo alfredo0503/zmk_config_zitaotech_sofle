@@ -1,8 +1,8 @@
 layout: {zmk_keyboard: zitaotech_sofle}
 layers:
-  QWERTY: [ESC, '1', '2', '3', '4', '5', MUTE, MUTE, '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, \, CAPS, A, S, D, F, G, '&mkp LCLK', '&mkp
-      LCLK', H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PG DN, PG UP, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT, SPACE, LOWER,
-    LOWER, SPACE, '-', '=', '`']
+  QWERTY: [ESC, '1', '2', '3', '4', '5', PP, PP, '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, \, CAPS, A, S, D, F, G, '&mkp LCLK', '&mkp LCLK',
+    H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PREV, NEXT, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT, SPACE, LOWER, LOWER, SPACE,
+    '-', '=', '`']
   LOWER:
   - ESC
   - F1
@@ -25,7 +25,7 @@ layers:
   - {t: ▽, type: trans}
   - OUT TOG
   - F11
-  - F12
+  - UP
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - HOME
@@ -38,9 +38,9 @@ layers:
   - {t: ▽, type: trans}
   - '&mkp RCLK'
   - '&mkp RCLK'
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - LEFT
+  - DOWN
+  - RIGHT
   - {t: ▽, type: trans}
   - ''''
   - ENTER
@@ -91,12 +91,12 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - OUT TOG
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - F11
+  - F12
+  - '7'
+  - '8'
+  - '9'
+  - \
   - CAPS
   - LEFT
   - DOWN
@@ -107,10 +107,10 @@ layers:
   - ''
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - '4'
+  - '5'
+  - '6'
+  - ENTER
   - LSHFT
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -122,21 +122,21 @@ layers:
   - ''
   - ''
   - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - ''
+  - '0'
+  - '1'
+  - '2'
+  - '3'
+  - RSHIFT
+  - LCTRL
   - LGUI
   - LALT
   - SPACE
   - LOWER
   - LOWER
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - SPACE
+  - '-'
+  - '='
+  - '`'
   MOUSE:
   - ESC
   - '1'
