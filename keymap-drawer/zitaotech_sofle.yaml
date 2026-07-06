@@ -10,7 +10,7 @@ layers:
   - F3
   - F4
   - F5
-  - BT CLR
+  - PP
   - MUTE
   - F6
   - F7
@@ -25,8 +25,8 @@ layers:
   - {t: ▽, type: trans}
   - OUT TOG
   - F11
+  - F12
   - UP
-  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - HOME
   - \
@@ -38,10 +38,10 @@ layers:
   - {t: ▽, type: trans}
   - '&mkp RCLK'
   - '&mkp RCLK'
+  - {t: ▽, type: trans}
   - LEFT
   - DOWN
   - RIGHT
-  - {t: ▽, type: trans}
   - ''''
   - ENTER
   - LSHFT
