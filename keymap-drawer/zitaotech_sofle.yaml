@@ -1,8 +1,8 @@
 layout: {zmk_keyboard: zitaotech_sofle}
 layers:
   QWERTY: [ESC, '1', '2', '3', '4', '5', PP, PP, '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, \, CAPS, A, S, D, F, G, '&mkp LCLK', '&mkp LCLK',
-    H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PREV, NEXT, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT, SPACE, LOWER, LOWER, SPACE,
-    '-', '=', '`']
+    H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PREV, NEXT, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT, SPACE, '&td_lower', '&td_lower',
+    SPACE, '-', '=', '`']
   LOWER:
   - ESC
   - F1
@@ -64,8 +64,8 @@ layers:
   - LGUI
   - LALT
   - SPACE
-  - {t: LOWER, type: held}
-  - LOWER
+  - '&td_lower'
+  - '&td_lower'
   - SPACE
   - {t: ▽, type: trans}
   - .
@@ -131,8 +131,8 @@ layers:
   - LGUI
   - LALT
   - SPACE
-  - LOWER
-  - LOWER
+  - '&td_lower'
+  - '&td_lower'
   - SPACE
   - '-'
   - '='
@@ -159,7 +159,7 @@ layers:
   - R
   - T
   - Y
-  - {t: U, h: '&mkp MB3'}
+  - {t: U, h: '&mkp MCLK'}
   - I
   - O
   - P
@@ -173,7 +173,7 @@ layers:
   - '&mkp LCLK'
   - '&mkp LCLK'
   - H
-  - {t: J, h: '&mkp MB1'}
+  - {t: J, h: '&mkp LCLK'}
   - K
   - L
   - ;
@@ -189,7 +189,7 @@ layers:
   - ''
   - ''
   - N
-  - {t: M, h: '&mkp MB2'}
+  - {t: M, h: '&mkp RCLK'}
   - ','
   - .
   - /
@@ -198,8 +198,8 @@ layers:
   - LGUI
   - LALT
   - SPACE
-  - '&mkp MB1'
-  - '&mkp MB1'
+  - '&mkp LCLK'
+  - '&mkp LCLK'
   - '&tdRMCLK'
   - '-'
   - '='
