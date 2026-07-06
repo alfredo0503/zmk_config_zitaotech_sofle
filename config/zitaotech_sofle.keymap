@@ -144,7 +144,7 @@
 &kp LSHFT &kp Z    &kp X      &kp C    &kp V     &kp B     &kp C_PREV &kp C_NEXT         &msc SCRL_DOWN  &msc SCRL_UP   &kp N       &kp M       &kp COMMA &kp DOT   &kp FSLH &kp RSHIFT
                    &kp LCTRL  &kp LGUI &kp LALT  &kp SPACE &td_lower                                     &td_lower      &kp SPACE   &kp MINUS   &kp EQUAL    &kp GRAVE
             >;
-            sensor-bindings = <&inc_dec_kp LEFT RIGHT &inc_dec_kp C_VOL_DN C_VOL_UP>;
+            sensor-bindings = <&inc_dec_kp RIGHT LEFT &inc_dec_kp C_VOL_DN C_VOL_UP>;
         };
 
         lower_layer {
