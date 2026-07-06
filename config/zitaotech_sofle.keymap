@@ -12,6 +12,7 @@
 #include <dt-bindings/zmk/backlight.h>
 #include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/rgb.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 
 #define FUNC 1
 #define RES 2
@@ -19,7 +20,6 @@
 
 / {
     input_processors {
-
         zip_temp_layer: zip_temp_layer {
             compatible = "zmk,input-processor-temp-layer";
             #input-processor-cells = <2>;
@@ -32,6 +32,7 @@
             codes = <INPUT_BTN_0>;
             bindings = <&kp RIGHT>;
         };
+
         ip_behaviors1: ip_behaviors1 {
             compatible = "zmk,input-processor-behaviors";
             #input-processor-cells = <0>;
@@ -39,6 +40,7 @@
             codes = <INPUT_BTN_1>;
             bindings = <&kp LEFT>;
         };
+
         ip_behaviors2: ip_behaviors2 {
             compatible = "zmk,input-processor-behaviors";
             #input-processor-cells = <0>;
@@ -46,6 +48,7 @@
             codes = <INPUT_BTN_2>;
             bindings = <&kp DOWN>;
         };
+
         ip_behaviors3: ip_behaviors3 {
             compatible = "zmk,input-processor-behaviors";
             #input-processor-cells = <0>;
@@ -54,9 +57,7 @@
             bindings = <&kp UP>;
         };
     };
-};
 
-/ {
     behaviors {
         td0: tap_dance_0 {
             compatible = "zmk,behavior-tap-dance";
@@ -64,89 +65,66 @@
             tapping-term-ms = <400>;
             bindings = <&mkp LCLK>, <&bt BT_CLR>;
         };
-    };
 
-        behaviors {
-        tdRMCLK: tap_dance_R_LMouse {
+        tdRMCLK: tap_dance_R_MMouse {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
             tapping-term-ms = <400>;
             bindings = <&mkp RCLK>, <&mkp MCLK>;
         };
-    };
 
-    behaviors {
+        td_lower: hold_lower_double_to_lower {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <400>;
+            bindings = <&mo 1>, <&to 1>;
+        };
+
+        td_raise: hold_raise_double_to_raise {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <400>;
+            bindings = <&mo 2>, <&to 2>;
+        };
+
+        to_def: to_QWERTY {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <200>;
+            bindings = <&to 0>, <&to 0>;
+        };
+
         hm: homerow_mods {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             tapping-term-ms = <500>;
             bindings = <&kp &kp>;
         };
-    };
 
-    behaviors {
-         sp_sc: behavior_spacescroll {
-           compatible = "zmk,behavior-hold-tap";
-           #binding-cells = <2>;
-           flavor = "tap-preferred";     /* 单击优先 */
-           tapping-term-ms = <200>;       /* 长按阈值 */
-           bindings = <&none &kp>;        /* hold=none, tap=space */
-        };
-    };
-
-    behaviors {
-         LMouse_sc: behavior_LMouse_Scroll {
-           compatible = "zmk,behavior-hold-tap";
-           #binding-cells = <2>;
-           flavor = "tap-preferred";     /* 单击优先 */
-           tapping-term-ms = <200>;       /* 长按阈值 */
-           bindings = <&none &mkp>;        /* hold=none, tap=Lmouse */
-        };
-    };
-
-    behaviors {
-         M_kp: behavior_mouse_keypress {
-           compatible = "zmk,behavior-hold-tap";
-           #binding-cells = <2>;
-           flavor = "tap-preferred";     /* 单击优先 */
-           tapping-term-ms = <200>;       /* 长按阈值 */
-           bindings = <&mkp &kp>;        /* hold=mou key press, tap=key*/
-        };
-    };
-
-behaviors {
-        // [복귀 전용] 어디서든 누르면 QWERTY(0번)로 복귀
-        to_def: to_QWERTY {
-            compatible = "zmk,behavior-tap-dance";
-            #binding-cells = <0>;
-            tapping-term-ms = <200>;
-            bindings = <&to 0>, <&to 0>; // 그냥 눌러도 0번으로 이동
-        };
-
-        // [이동 전용] 길게 누르면 모멘터리, 더블탭하면 고정
-        // 사용법: &lt to <레이어번호> <모멘터리레이어>
-        lt_to: layer_tap_to_LOWER {
+        sp_sc: behavior_spacescroll {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "tap-preferred";
             tapping-term-ms = <200>;
-            quick-tap-ms = <200>;
-            bindings = <&mo>, <&to>;
+            bindings = <&none &kp>;
         };
-    };
 
-behaviors {
-         lt_to: layer_tap_to_RAISE {
+        LMouse_sc: behavior_LMouse_Scroll {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
             flavor = "tap-preferred";
             tapping-term-ms = <200>;
-            quick-tap-ms = <200>;
-            bindings = <&mo>, <&to>;
+            bindings = <&none &mkp>;
         };
-    };
 
-    behaviors {
+        M_kp: behavior_mouse_keypress {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            bindings = <&mkp &kp>;
+        };
+
         BLE_encoder: BLE_encoder {
             compatible = "zmk,behavior-sensor-rotate";
             #sensor-binding-cells = <0>;
@@ -157,55 +135,56 @@ behaviors {
     keymap {
         compatible = "zmk,keymap";
 
-         default_layer {
+        default_layer {
             display-name = "QWERTY";
             bindings = <
-&kp ESC   &kp N1   &kp N2     &kp N3   &kp N4    &kp N5    &kp C_PP                      &kp C_PP                       &kp N6      &kp N7      &kp N8    &kp N9    &kp N0   &kp BSPC            
+&kp ESC   &kp N1   &kp N2     &kp N3   &kp N4    &kp N5    &kp C_PP                      &kp C_PP                       &kp N6      &kp N7      &kp N8    &kp N9    &kp N0   &kp BSPC
 &kp TAB   &kp Q    &kp W      &kp E    &kp R     &kp T                                                                  &kp Y       &kp U       &kp I     &kp O     &kp P    &kp BSLH
 &kp CAPS  &kp A    &kp S      &kp D    &kp F     &kp G     &mkp LCLK                     &mkp LCLK                      &kp H       &kp J       &kp K     &kp L     &kp SEMI &kp ENTER
 &kp LSHFT &kp Z    &kp X      &kp C    &kp V     &kp B     &kp C_PREV &kp C_NEXT         &msc SCRL_DOWN  &msc SCRL_UP   &kp N       &kp M       &kp COMMA &kp DOT   &kp FSLH &kp RSHIFT
-                   &kp LCTRL  &kp LGUI &kp LALT  &kp SPACE &mo 1                                         &mo 1          &kp SPACE   &kp MINUS   &kp EQUAL    &kp GRAVE
-           >;
-           sensor-bindings = <&inc_dec_kp LEFT RIGHT &inc_dec_kp C_VOL_UP C_VOL_DOWN>;
+                   &kp LCTRL  &kp LGUI &kp LALT  &kp SPACE &td_lower                                     &td_lower      &kp SPACE   &kp MINUS   &kp EQUAL    &kp GRAVE
+            >;
+            sensor-bindings = <&inc_dec_kp LEFT RIGHT &inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
-
 
         lower_layer {
             display-name = "LOWER";
             bindings = <
-&kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &bt BT_CLR                   &kp C_MUTE             &kp F6    &kp F7   &kp F8     &kp F9    &kp F10    &kp DEL         
+&kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &bt BT_CLR                   &kp C_MUTE             &kp F6    &kp F7   &kp F8     &kp F9    &kp F10    &kp DEL
 &kp TAB     &trans    &kp UP     &trans    &trans    &out OUT_TOG                                                         &kp F11   &kp UP   &trans     &trans    &kp HOME   &kp BSLH
-&kp CAPS    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp RCLK                    &mkp RCLK              &kp LEFT  &kp DOWN &kp RIGHT  &trans    &kp SQT    &kp ENTER
+&kp CAPS    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp RCLK                    &mkp RCLK              &kp LEFT  &kp DOWN &kp RIGHT  &trans    &kp APOS   &kp ENTER
 &kp LSHFT   &trans    &trans     &trans    &trans    &rgb_ug RGB_TOG  &trans     &trans            &bl BL_DEC  &bl BL_INC &trans    &trans   &kp LBKT   &kp RBKT  &kp UNDER  &kp PLUS
-                      &BOT       &kp LGUI  &kp LALT  &kp SPACE        &mo 1                                     &mo 1     &kp SPACE &trans   &kp DOT    &BOT 
+                      &BOT       &kp LGUI  &kp LALT  &kp SPACE        &td_lower                                &td_lower &kp SPACE &trans   &kp DOT    &BOT
             >;
-            // 좌측 노브: 페이지 업/다운, 우측 노브: 볼륨 업/다운
             sensor-bindings = <&inc_dec_kp PG_UP PG_DN &inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
+
         raise_layer {
             display-name = "RAISE";
             bindings = <
-&kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &bt BT_CLR                   &kp C_MUTE             &kp F6    &kp F7    &kp F8    &kp F9    &kp F10    &kp BSPC            
+&kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &bt BT_CLR                   &kp C_MUTE             &kp F6    &kp F7    &kp F8    &kp F9    &kp F10    &kp BSPC
 &kp TAB     &trans    &kp UP     &trans    &trans    &out OUT_TOG                                                         &kp F11   &kp F12   &kp N7    &kp N8    &kp N9     &kp BSLH
 &kp CAPS    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp RCLK                    &none                  &trans    &trans    &kp N4    &kp N5    &kp N6     &kp ENTER
 &kp LSHFT   &trans    &trans     &trans    &trans    &rgb_ug RGB_TOG  &trans     &trans            &none   &none          &trans    &kp N0    &kp N1    &kp N2    &kp N3     &kp RSHIFT
-                      &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &mo 1                                     &mo 1     &kp SPACE &kp MINUS &kp EQUAL &kp GRAVE
+                      &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &td_lower                               &td_lower &kp SPACE &kp MINUS &kp EQUAL &kp GRAVE
             >;
-        }; 
+        };
+
         MOUSE_layer {
             display-name = "MOUSE";
             bindings = <
-&kp ESC   &kp N1    &kp N2     &kp N3   &kp N4   &kp N5     &bt BT_CLR                       &kp C_MUTE       &kp N6     &kp N7         &kp N8    &kp N9    &kp N0   &kp BSPC              
-&kp TAB   &kp Q     &kp W      &kp E    &kp R    &kp T                                                        &kp Y      &M_kp MB3 U    &kp I     &kp O     &kp P    &kp BSLH
-&kp CAPS  &kp A     &kp S      &kp D    &kp F    &kp G      &mkp LCLK                        &mkp LCLK        &kp H      &M_kp MB1 J    &kp K     &kp L     &kp SEMI &kp ENTER
-&kp LSHFT &kp Z     &kp X      &kp C    &kp V    &kp B      &msc SCRL_DOWN   &msc SCRL_UP    &none  &none     &kp N      &M_kp MB2 M    &kp COMMA &kp DOT   &kp FSLH &kp RSHIFT
-                    &kp LCTRL  &kp LGUI &kp LALT &kp SPACE  &mkp MB1                         &LMouse_sc 0 MB1 &tdRMCLK   &kp MINUS      &kp EQUAL    &kp GRAVE
-           >;
+&kp ESC   &kp N1    &kp N2     &kp N3   &kp N4   &kp N5     &bt BT_CLR                       &kp C_MUTE       &kp N6     &kp N7         &kp N8    &kp N9    &kp N0   &kp BSPC
+&kp TAB   &kp Q     &kp W      &kp E    &kp R    &kp T                                                        &kp Y      &M_kp MCLK U    &kp I     &kp O     &kp P    &kp BSLH
+&kp CAPS  &kp A     &kp S      &kp D    &kp F    &kp G      &mkp LCLK                        &mkp LCLK        &kp H      &M_kp LCLK J    &kp K     &kp L     &kp SEMI &kp ENTER
+&kp LSHFT &kp Z     &kp X      &kp C    &kp V    &kp B      &msc SCRL_DOWN   &msc SCRL_UP    &none  &none     &kp N      &M_kp RCLK M    &kp COMMA &kp DOT   &kp FSLH &kp RSHIFT
+                    &kp LCTRL  &kp LGUI &kp LALT &kp SPACE  &mkp LCLK                         &mkp LCLK &tdRMCLK   &kp MINUS      &kp EQUAL    &kp GRAVE
+            >;
         };
-        RES_layer { 
+
+        RES_layer {
             display-name = "RESERVE";
             bindings = <
-&none     &none     &none      &none    &none    &none   &none                        &none            &none   &none  &none   &none  &none  &none            
+&none     &none     &none      &none    &none    &none   &none                        &none            &none   &none  &none   &none  &none  &none
 &none     &none     &none      &none    &none    &none                                                 &none   &none  &none   &none  &none  &none
 &none     &none     &none      &none    &none    &none   &none                        &none            &none   &none  &none   &none  &none  &none
 &none     &none     &none      &none    &none    &none   &none   &none                &none  &none     &none   &none  &none   &none  &none  &none
