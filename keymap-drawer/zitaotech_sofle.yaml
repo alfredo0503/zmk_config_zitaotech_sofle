@@ -18,7 +18,7 @@ layers:
   - F9
   - F10
   - DEL
-  - TAB
+  - DEL
   - {t: ▽, type: trans}
   - UP
   - {t: ▽, type: trans}
@@ -30,7 +30,7 @@ layers:
   - {t: ▽, type: trans}
   - HOME
   - \
-  - CAPS
+  - BSPC
   - LEFT
   - DOWN
   - RIGHT
@@ -50,8 +50,8 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - RGB TOG
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - BT PRV
+  - BT NXT
   - '&bl BL_DEC'
   - '&bl BL_INC'
   - {t: ▽, type: trans}
@@ -59,7 +59,7 @@ layers:
   - '['
   - ']'
   - _
-  - +
+  - RSHIFT
   - '&bootloader'
   - LGUI
   - LALT
