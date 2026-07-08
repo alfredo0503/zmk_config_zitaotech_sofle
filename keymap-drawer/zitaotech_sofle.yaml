@@ -19,9 +19,9 @@ layers:
   - F10
   - DEL
   - DEL
-  - {t: ▽, type: trans}
+  - VOL DN
   - UP
-  - {t: ▽, type: trans}
+  - VOL UP
   - {t: ▽, type: trans}
   - OUT TOG
   - F11
@@ -58,7 +58,7 @@ layers:
   - {t: ▽, type: trans}
   - '['
   - ']'
-  - _
+  - /
   - RSHIFT
   - '&bootloader'
   - LGUI
