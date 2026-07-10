@@ -156,7 +156,7 @@
 &kp LSHFT   &kp ENTER &trans     &trans    &trans    &rgb_ug RGB_TOG  &bt BT_PRV   &bt BT_NXT      &bl BL_DEC  &bl BL_INC &trans    &trans   &kp LBKT   &kp RBKT  &kp FSLH   &kp RSHIFT
                       &BOT       &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def      &kp SPACE &trans   &kp DOT    &BOT
             >;
-            sensor-bindings = <&inc_dec_kp PG_UP PG_DN &inc_dec_kp C_VOL_UP C_VOL_DN>;
+            sensor-bindings = <&inc_dec_kp PG_DN PG_UP &inc_dec_kp C_VOL_DN C_VOL_UP>;
         };
 
         raise_layer {
