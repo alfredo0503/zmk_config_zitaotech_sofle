@@ -154,7 +154,7 @@
 &kp DEL     &kp C_VOL_DN &kp UP  &kp C_VOL_UP &trans &out OUT_TOG                                                         &kp F11   &kp F12  &kp UP     &trans    &kp HOME   &kp BSLH
 &kp BSPC    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp RCLK                    &mkp RCLK              &trans    &kp LEFT &kp DOWN   &kp RIGHT &kp APOS   &kp ENTER
 &kp LSHFT   &kp ENTER &trans     &trans    &trans    &rgb_ug RGB_TOG  &bt BT_PRV   &bt BT_NXT      &bl BL_DEC  &bl BL_INC &trans    &trans   &kp LBKT   &kp RBKT  &kp FSLH   &kp RSHIFT
-                      &BOT       &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def      &kp SPACE &trans   &kp DOT    &BOT
+                      &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def      &kp SPACE &trans   &kp DOT    &BOT
             >;
             sensor-bindings = <&inc_dec_kp PG_DN PG_UP &inc_dec_kp C_VOL_DN C_VOL_UP>;
         };
