@@ -60,7 +60,7 @@ layers:
   - ']'
   - /
   - RSHIFT
-  - '&bootloader'
+  - LCTRL
   - LGUI
   - LALT
   - SPACE
