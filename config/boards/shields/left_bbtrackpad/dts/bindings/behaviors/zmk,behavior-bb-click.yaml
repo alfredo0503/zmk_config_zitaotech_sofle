@@ -1,0 +1,3 @@
+description: BB trackpad physical click (LOWER selects right click)
+compatible: "zmk,behavior-bb-click"
+include: zero_param.yaml

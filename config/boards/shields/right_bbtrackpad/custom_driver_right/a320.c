@@ -308,6 +308,11 @@ static void a320_work_cb(struct k_work *work) {
         last_touch_time = now;
         touch_led_last_motion_ms = now;
         touched = true;
+
+        /* v6: local LED fallback/diagnostic.  This does not change motion,
+         * DPI, scrolling, or split input; it only pulses the right pad LED.
+         */
+        custom_led_note_pointer_activity();
     }
 
     /* ========= ⭐ TOUCH RELEASE 判定（关键修复） ========= */

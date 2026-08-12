@@ -130,18 +130,10 @@
             #sensor-binding-cells = <0>;
             bindings = <&bt BT_NXT>, <&bt BT_PRV>;
         };
-    };
 
-    conditional_layers {
-        compatible = "zmk,conditional-layers";
-
-        mouse_lower_click {
-            /* If auto MOUSE (3) is still active while LOWER (1) is held,
-             * layer 4 wins only for the physical BB click positions.
-             * This guarantees LOWER + either BB pad click = right click.
-             */
-            if-layers = <1 3>;
-            then-layer = <4>;
+        bbclick: bb_trackpad_click {
+            compatible = "zmk,behavior-bb-click";
+            #binding-cells = <0>;
         };
     };
 
@@ -151,9 +143,9 @@
         default_layer {
             display-name = "QWERTY";
             bindings = <
-&kp ESC   &kp N1   &kp N2     &kp N3   &kp N4    &kp N5    &mkp LCLK                     &mkp LCLK                       &kp N6      &kp N7      &kp N8    &kp N9    &kp N0   &kp BSPC
+&kp ESC   &kp N1   &kp N2     &kp N3   &kp N4    &kp N5    &bbclick                       &bbclick                       &kp N6      &kp N7      &kp N8    &kp N9    &kp N0   &kp BSPC
 &kp TAB   &kp Q    &kp W      &kp E    &kp R     &kp T                                                                  &kp Y       &kp U       &kp I     &kp O     &kp P    &kp BSLH
-&kp CAPS  &kp A    &kp S      &kp D    &kp F     &kp G     &mkp LCLK                     &mkp LCLK                      &kp H       &kp J       &kp K     &kp L     &kp SEMI &kp ENTER
+&kp CAPS  &kp A    &kp S      &kp D    &kp F     &kp G     &bbclick                       &bbclick                      &kp H       &kp J       &kp K     &kp L     &kp SEMI &kp ENTER
 &kp LSHFT &kp Z    &kp X      &kp C    &kp V     &kp B     &kp C_PREV &kp C_NEXT         &msc SCRL_DOWN  &msc SCRL_UP   &kp N       &kp M       &kp COMMA &kp DOT   &kp FSLH &kp RSHIFT
                    &kp LCTRL  &kp LGUI &kp LALT  &kp SPACE &td_lower                                     &td_lower      &kp SPACE   &kp MINUS   &kp EQUAL    &kp GRAVE
             >;
@@ -163,9 +155,9 @@
         lower_layer {
             display-name = "LOWER";
             bindings = <
-&kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &mkp RCLK                    &mkp RCLK             &kp F6    &kp F7   &kp F8     &kp F9    &kp F10    &kp DEL
+&kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &bbclick                      &bbclick             &kp F6    &kp F7   &kp F8     &kp F9    &kp F10    &kp DEL
 &kp DEL     &kp C_VOL_DN &kp UP  &kp C_VOL_UP &trans &out OUT_TOG                                                         &kp F11   &kp F12  &kp UP     &trans    &kp HOME   &kp BSLH
-&kp BSPC    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp RCLK                    &mkp RCLK              &trans    &kp LEFT &kp DOWN   &kp RIGHT &kp APOS   &kp ENTER
+&kp BSPC    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &bbclick                      &bbclick              &trans    &kp LEFT &kp DOWN   &kp RIGHT &kp APOS   &kp ENTER
 &kp LSHFT   &kp ENTER &trans     &trans    &trans    &rgb_ug RGB_TOG  &bt BT_PRV   &bt BT_NXT      &bl BL_DEC  &bl BL_INC &trans    &trans   &kp LBKT   &kp RBKT  &kp FSLH   &kp RSHIFT
                       &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def      &kp SPACE &trans   &kp DOT    &BOT
             >;
@@ -186,9 +178,9 @@
         MOUSE_layer {
             display-name = "MOUSE";
             bindings = <
-&kp ESC   &kp N1    &kp N2     &kp N3   &kp N4   &kp N5     &mkp LCLK                        &mkp LCLK       &kp N6     &kp N7         &kp N8    &kp N9    &kp N0   &kp BSPC
+&kp ESC   &kp N1    &kp N2     &kp N3   &kp N4   &kp N5     &bbclick                         &bbclick       &kp N6     &kp N7         &kp N8    &kp N9    &kp N0   &kp BSPC
 &kp TAB   &kp Q     &kp W      &kp E    &kp R    &kp T                                                        &kp Y      &M_kp MCLK U    &kp I     &kp O     &kp P    &kp BSLH
-&kp CAPS  &kp A     &kp S      &kp D    &kp F    &kp G      &mkp LCLK                        &mkp LCLK        &kp H      &M_kp LCLK J    &kp K     &kp L     &kp SEMI &kp ENTER
+&kp CAPS  &kp A     &kp S      &kp D    &kp F    &kp G      &bbclick                         &bbclick        &kp H      &M_kp LCLK J    &kp K     &kp L     &kp SEMI &kp ENTER
 &kp LSHFT &kp Z     &kp X      &kp C    &kp V    &kp B      &msc SCRL_DOWN   &msc SCRL_UP    &none  &none     &kp N      &M_kp RCLK M    &kp COMMA &kp DOT   &kp FSLH &kp RSHIFT
                     &kp LCTRL  &kp LGUI &kp LALT &kp SPACE  &mkp LCLK                         &mkp LCLK &tdRMCLK   &kp MINUS      &kp EQUAL    &kp GRAVE
             >;
@@ -197,9 +189,9 @@
         RES_layer {
             display-name = "MOUSE+LOWER";
             bindings = <
-&trans    &trans    &trans     &trans   &trans   &trans    &mkp RCLK                      &mkp RCLK       &trans    &trans    &trans   &trans   &trans   &trans
+&trans    &trans    &trans     &trans   &trans   &trans    &trans                        &trans       &trans    &trans    &trans   &trans   &trans   &trans
 &trans    &trans    &trans     &trans   &trans   &trans                                                   &trans    &trans    &trans   &trans   &trans   &trans
-&trans    &trans    &trans     &trans   &trans   &trans    &mkp RCLK                      &mkp RCLK       &trans    &trans    &trans   &trans   &trans   &trans
+&trans    &trans    &trans     &trans   &trans   &trans    &trans                        &trans       &trans    &trans    &trans   &trans   &trans   &trans
 &trans    &trans    &trans     &trans   &trans   &trans    &trans      &trans             &trans  &trans   &trans    &trans    &trans   &trans   &trans   &trans
                     &trans     &trans   &trans   &trans    &trans                             &trans        &trans   &trans   &trans   &trans
             >;
