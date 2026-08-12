@@ -1,8 +1,8 @@
 layout: {zmk_keyboard: zitaotech_sofle}
 layers:
-  QWERTY: [ESC, '1', '2', '3', '4', '5', PP, PP, '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, \, CAPS, A, S, D, F, G, '&mkp LCLK', '&mkp LCLK',
-    H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PREV, NEXT, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT, SPACE, '&td_lower', '&td_lower',
-    SPACE, '-', '=', '`']
+  QWERTY: [ESC, '1', '2', '3', '4', '5', '&mkp LCLK', '&mkp LCLK', '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, \, CAPS, A, S, D, F, G, '&mkp
+      LCLK', '&mkp LCLK', H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PREV, NEXT, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT, SPACE,
+    '&td_lower', '&td_lower', SPACE, '-', '=', '`']
   LOWER:
   - ESC
   - F1
@@ -10,8 +10,8 @@ layers:
   - F3
   - F4
   - F5
-  - PP
-  - MUTE
+  - '&mkp RCLK'
+  - '&mkp RCLK'
   - F6
   - F7
   - F8
@@ -144,8 +144,8 @@ layers:
   - '3'
   - '4'
   - '5'
-  - BT CLR
-  - MUTE
+  - '&mkp LCLK'
+  - '&mkp LCLK'
   - '6'
   - '7'
   - '8'
