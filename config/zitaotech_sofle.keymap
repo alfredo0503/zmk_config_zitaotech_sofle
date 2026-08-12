@@ -59,6 +59,16 @@
     };
 
     behaviors {
+        /*
+         * Global mouse-layer LED sync behavior.
+         * The node name is intentionally <= 8 chars because GLOBAL behaviors
+         * are invoked on the peripheral half of a split keyboard as well.
+         */
+        mled: mled {
+            compatible = "zmk,behavior-mouse-led-sync";
+            #binding-cells = <0>;
+        };
+
         td0: tap_dance_0 {
             compatible = "zmk,behavior-tap-dance";
             #binding-cells = <0>;
