@@ -90,6 +90,7 @@ static bool last_scroll_key_pressed = false; // ★ NEW
 static bool last_arrow_key_pressed = false;
 uint32_t last_packet_time = 0;
 static bool touched = false;
+static uint32_t touch_led_last_motion_ms = 0;
 
 /* ==== HID indicators ==== */
 static zmk_hid_indicators_t current_indicators;
@@ -171,11 +172,12 @@ static int a320_read_packet(const struct device *dev, int8_t *dx, int8_t *dy) {
     *dx = (int8_t)buf[1];
     *dy = -(int8_t)buf[2];
 
+    k_mutex_unlock(&a320_i2c_mutex);
     return 0;
 
 out:
     k_mutex_unlock(&a320_i2c_mutex);
-    return ret;
+    return -EIO;
 }
 
 /* ========= ★ 抽象复用：滚轮单轴处理函数 ========= */
@@ -304,6 +306,7 @@ static void a320_work_cb(struct k_work *work) {
 
     if (got_data) {
         last_touch_time = now;
+        touch_led_last_motion_ms = now;
         touched = true;
     }
 
@@ -370,7 +373,14 @@ static void a320_work_cb(struct k_work *work) {
     } else if (!capslock) {
 
         uint8_t a320_led_brt = indicator_tp_get_last_valid_brightness();
-        float a320_factor = 0.4f + 0.01f * a320_led_brt;
+        /*
+         * Treat the 0..100 backlight value as the user's pointer-speed dial.
+         * MOUSE_BASE_SPEED extends the useful upper range for the tiny A320 pad.
+         * Defaults now provide roughly 0.94x .. 2.63x output scaling,
+         * with boot brightness 40 landing near 1.5x.
+         */
+        float a320_factor = MOUSE_BASE_SPEED *
+                            (MOUSE_SENS_BASE + MOUSE_SENS_STEP * a320_led_brt);
 
         float slow_mult = slow_key_pressed ? SLOW_KEY_MULTIPLIER : 1.0f;
 
@@ -399,7 +409,12 @@ static void motion_isr(const struct device *port, struct gpio_callback *cb, uint
     k_work_submit_to_queue(&a320_workq, &data->work);
 }
 
-bool tp_is_touched(void) { return touched; }
+bool tp_is_touched(void) {
+    if (touch_led_last_motion_ms == 0) {
+        return false;
+    }
+    return (k_uptime_get_32() - touch_led_last_motion_ms) <= TOUCH_IDLE_TIMEOUT;
+}
 
 static void a320_enable_irq_work_cb(struct k_work *work) {
     struct k_work_delayable *dwork = CONTAINER_OF(work, struct k_work_delayable, work);

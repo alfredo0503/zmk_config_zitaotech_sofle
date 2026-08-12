@@ -72,11 +72,11 @@ config A320_SCROLL_INPUT_MAX
 
 config A320_SCROLL_DIVISOR_SLOW
     int "Scroll divisor slow (Fine-grained control)"
-    default 60
+    default 30
 
 config A320_SCROLL_DIVISOR_FAST
     int "Scroll divisor fast (Max speed limit)"
-    default 8
+    default 4
 
 config A320_DOMINANT_NUMERATOR
     int "Dominant axis numerator for accidental touch prevention"
@@ -87,8 +87,8 @@ config A320_DOMINANT_DENOMINATOR
     default 2
 
 config A320_MOUSE_BASE_SPEED_PERCENT
-    int "Mouse base speed (Percentage, 50 = 0.5)"
-    default 150
+    int "Mouse base speed multiplier (Percentage, 250 = 2.5)"
+    default 250
 
 config A320_MOUSE_SENS_BASE_PERCENT
     int "Mouse sensitivity base (Percentage, 40 = 0.3)"

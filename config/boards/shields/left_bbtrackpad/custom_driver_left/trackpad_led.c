@@ -10,7 +10,6 @@
 #include <zephyr/drivers/led.h>
 #include <zephyr/logging/log.h>
 
-#include <zmk/endpoints.h>
 #include <zmk/hid_indicators.h>
 #include <zmk/backlight.h>
 #include <zmk/activity.h>
@@ -39,13 +38,9 @@ static const struct device *const led_dev = DEVICE_DT_GET(DT_CHOSEN(zmk_trackpad
 #define POLLING_INTERVAL_MS 5
 #define AUTO_OFF_DELAY_MS 5000
 
-#define FLASH_ON_MS 100   /* USB 模式亮灯时间 */
-#define FLASH_PERIOD 1000 /* USB 模式总周期 */
-
 static struct k_work_delayable polling_work;
 static struct k_work_delayable animation_work;
 static struct k_work_delayable auto_off_work;
-static struct k_work_delayable usb_flash_work;
 
 static bool capslock_on = false;
 static bool touch_active = false;
@@ -56,9 +51,6 @@ static uint8_t last_valid_brt = BRT_MAX;
 static uint8_t last_backlight_brt = 0;
 static bool manual_override = false;
 static bool keyboard_active = false;
-
-static bool usb_flash_state = false; /* true=亮灯，false=灭灯 */
-static bool usb_mode = false;        /* 当前是否处于 USB 传输模式 */
 
 static void set_led_brightness(uint8_t level) {
     if (!device_is_ready(led_dev)) {
@@ -73,22 +65,11 @@ static void set_led_brightness(uint8_t level) {
     }
 }
 
-/* USB 闪烁处理 */
-static void usb_flash_work_handler(struct k_work *work) {
-    if (!usb_mode) {
-        /* 如果已经不在 USB 模式，确保灯灭并退出 */
-        set_led_brightness(0);
-        return;
-    }
-
-    usb_flash_state = !usb_flash_state;
-    set_led_brightness(usb_flash_state ? BRT_MAX : 0);
-
-    /* 下次调度：亮灯持续 FLASH_ON_MS，其余时间灭 */
-    k_work_reschedule(&usb_flash_work,
-                      K_MSEC(usb_flash_state ? FLASH_ON_MS : (FLASH_PERIOD - FLASH_ON_MS)));
-}
-
+/*
+ * USB transport is intentionally NOT treated as a blink mode.
+ * The old firmware flashed this LED every second whenever USB was selected,
+ * which looked like a fault during normal wired/charging use.
+ */
 static void auto_off_work_handler(struct k_work *work) {
     if (!capslock_on && !touch_active) {
         manual_override = false;
@@ -120,34 +101,12 @@ static void animation_work_handler(struct k_work *work) {
 }
 
 static void polling_work_handler(struct k_work *work) {
-    enum zmk_transport transport = zmk_endpoints_selected().transport;
     bool current_capslock = (zmk_hid_indicators_get_current_profile() & HID_INDICATORS_CAPS_LOCK);
     bool current_touch = tp_is_touched();
     bool current_active = (zmk_activity_get_state() == ZMK_ACTIVITY_ACTIVE);
     uint8_t current_brt = zmk_backlight_get_brt();
 
-    /* ---------------- USB 模式 ---------------- */
-    if (transport == ZMK_TRANSPORT_USB) {
-        if (!usb_mode) {
-            /* 进入 USB 模式：启动闪烁任务 */
-            usb_mode = true;
-            usb_flash_state = false;
-            k_work_reschedule(&usb_flash_work, K_NO_WAIT);
-            LOG_INF("Entered USB flash mode");
-        }
-        /* 不再执行 BLE 逻辑 */
-        k_work_reschedule(&polling_work, K_MSEC(POLLING_INTERVAL_MS));
-        return;
-    }
-
-    /* ---------------- BLE 模式 ---------------- */
-    if (usb_mode) {
-        /* 从 USB 切回 BLE，需要停止闪烁并熄灯 */
-        usb_mode = false;
-        k_work_cancel_delayable(&usb_flash_work);
-        set_led_brightness(0);
-        LOG_INF("Exited USB flash mode");
-    }
+    /* USB and BLE now share the same LED behavior. */
 
     if (current_active != keyboard_active) {
         keyboard_active = current_active;
@@ -219,15 +178,12 @@ static int indicator_tp_init(void) {
     }
 
     set_led_brightness(0);
-    usb_mode = false;
-    usb_flash_state = false;
     last_backlight_brt = zmk_backlight_get_brt();
     capslock_on = touch_active = manual_override = keyboard_active = false;
 
     k_work_init_delayable(&polling_work, polling_work_handler);
     k_work_init_delayable(&animation_work, animation_work_handler);
     k_work_init_delayable(&auto_off_work, auto_off_work_handler);
-    k_work_init_delayable(&usb_flash_work, usb_flash_work_handler);
 
     k_work_reschedule(&polling_work, K_NO_WAIT);
     return 0;
