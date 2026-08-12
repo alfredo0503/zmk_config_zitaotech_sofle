@@ -1,8 +1,8 @@
 layout: {zmk_keyboard: zitaotech_sofle}
 layers:
-  QWERTY: [ESC, '1', '2', '3', '4', '5', '&mkp LCLK', '&mkp LCLK', '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, \, CAPS, A, S, D, F, G, '&mkp
-      LCLK', '&mkp LCLK', H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PREV, NEXT, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT, SPACE,
-    '&td_lower', '&td_lower', SPACE, '-', '=', '`']
+  QWERTY: [ESC, '1', '2', '3', '4', '5', '&bbclick', '&bbclick', '6', '7', '8', '9', '0', BSPC, TAB, Q, W, E, R, T, Y, U, I, O, P, \, CAPS, A, S, D, F, G, '&bbclick',
+    '&bbclick', H, J, K, L, ;, ENTER, LSHFT, Z, X, C, V, B, PREV, NEXT, '&msc SCRL_DOWN', '&msc SCRL_UP', N, M, ',', ., /, RSHIFT, LCTRL, LGUI, LALT, SPACE, '&td_lower',
+    '&td_lower', SPACE, '-', '=', '`']
   LOWER:
   - ESC
   - F1
@@ -10,8 +10,8 @@ layers:
   - F3
   - F4
   - F5
-  - '&mkp RCLK'
-  - '&mkp RCLK'
+  - '&bbclick'
+  - '&bbclick'
   - F6
   - F7
   - F8
@@ -36,8 +36,8 @@ layers:
   - RIGHT
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&mkp RCLK'
-  - '&mkp RCLK'
+  - '&bbclick'
+  - '&bbclick'
   - {t: ▽, type: trans}
   - LEFT
   - DOWN
@@ -144,8 +144,8 @@ layers:
   - '3'
   - '4'
   - '5'
-  - '&mkp LCLK'
-  - '&mkp LCLK'
+  - '&bbclick'
+  - '&bbclick'
   - '6'
   - '7'
   - '8'
@@ -170,8 +170,8 @@ layers:
   - D
   - F
   - G
-  - '&mkp LCLK'
-  - '&mkp LCLK'
+  - '&bbclick'
+  - '&bbclick'
   - H
   - {t: J, h: '&mkp LCLK'}
   - K
@@ -211,8 +211,6 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&mkp RCLK'
-  - '&mkp RCLK'
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -237,8 +235,10 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&mkp RCLK'
-  - '&mkp RCLK'
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
