@@ -1,0 +1,8 @@
+file_format: "1"
+id: right_bbtrackpad
+name: right_bbtrackpad
+type: shield
+url:
+requires:
+features:
+  - mouse

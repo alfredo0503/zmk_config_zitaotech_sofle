@@ -1,0 +1,100 @@
+/*
+ * Right A320 BlackBerry-style trackpad shield for ZitaoTech Sofle.
+ * Derived from the seller's left_bbtrackpad A320 implementation and
+ * the known-working right_trackpoint electrical/split path.
+ *
+ * Assumed right module interface (from existing right_trackpoint):
+ *   I2C SDA   P0.07
+ *   I2C SCL   P1.08
+ *   MOTION_N  P0.14   (used by custom_driver_right/a320.c)
+ *   LED PWM   P0.04
+ *   A320 I2C  0x3B
+ */
+
+/ {
+    chosen {
+        /* Reuse the right side's proven LED implementation/pin. */
+        zmk,custom_led = &custom_led;
+    };
+
+    custom_led: pwmledto {
+        compatible = "pwm-leds";
+        pwm_led_0 {
+            pwms = <&pwm1 0 PWM_USEC(20) PWM_POLARITY_NORMAL>;
+        };
+    };
+};
+
+&pwm1 {
+    status = "okay";
+    pinctrl-0 = <&pwm1_default>;
+    pinctrl-1 = <&pwm1_sleep>;
+    pinctrl-names = "default", "sleep";
+};
+
+&i2c0 {
+    status = "okay";
+    compatible = "nordic,nrf-twim";
+    clock-frequency = <I2C_BITRATE_FAST>;
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
+
+    bbtrackpad: a320@3b {
+        compatible = "avago,a320";
+        reg = <0x3B>;
+        status = "okay";
+    };
+};
+
+/*
+ * Deliberately keep the existing RIGHT pointing split ID/path.
+ * On the LEFT central, trackpoint_split/trackpoint_listener already exists
+ * and is proven by the current right TrackPoint firmware.  This avoids a
+ * conflict with the LEFT local bbtrackpad_listener when both sides are A320.
+ */
+/ {
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        trackpoint_split: trackpoint_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+    };
+};
+
+&trackpoint_split {
+    device = <&bbtrackpad>;
+};
+
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 7)>,
+                    <NRF_PSEL(TWIM_SCL, 1, 8)>;
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 7)>,
+                    <NRF_PSEL(TWIM_SCL, 1, 8)>;
+            low-power-enable;
+        };
+    };
+
+    pwm1_default: pwm1_default {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 4)>;
+        };
+    };
+
+    pwm1_sleep: pwm1_sleep {
+        group1 {
+            psels = <NRF_PSEL(PWM_OUT0, 0, 4)>;
+            bias-pull-down;
+        };
+    };
+};
