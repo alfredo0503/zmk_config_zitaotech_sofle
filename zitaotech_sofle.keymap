@@ -183,10 +183,10 @@
         raise_layer {
             display-name = "RAISE";
             bindings = <
-&kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &mkp LCLK                    &mkp LCLK              &kp F6    &kp F7    &kp KP_DIVIDE   &kp KP_MULTIPLY &kp KP_MINUS &kp BSPC
-&kp TAB     &trans    &kp UP     &trans    &trans    &out OUT_TOG                                                          &kp F11   &kp KP_N7  &kp KP_N8       &kp KP_N9       &kp KP_PLUS  &kp BSLH
-&kp CAPS    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp LCLK                    &mkp LCLK              &trans    &kp KP_N4 &kp KP_N5       &kp KP_N6       &kp N6       &kp ENTER
-&kp LSHFT   &trans    &trans     &trans    &trans    &rgb_ug RGB_TOG  &trans      &trans           &to 0    &to 0          &trans    &kp KP_N1 &kp KP_N2       &kp KP_N3       &kp N3       &kp RSHIFT
+&kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &mkp LCLK                    &mkp LCLK              &trans    &trans    &kp KP_DIVIDE   &kp KP_MULTIPLY &kp KP_MINUS &kp BSPC
+&kp TAB     &trans    &kp UP     &trans    &trans    &out OUT_TOG                                                         &trans   &kp KP_N7  &kp KP_N8       &kp KP_N9       &kp KP_PLUS  &kp BSLH
+&kp CAPS    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp LCLK                    &mkp LCLK              &trans    &kp KP_N4 &kp KP_N5       &kp KP_N6       &trans       &kp ENTER
+&kp LSHFT   &trans    &trans     &trans    &trans    &rgb_ug RGB_TOG  &trans      &trans           &to 0    &to 0          &trans    &kp KP_N1 &kp KP_N2       &kp KP_N3       &trans       &kp RSHIFT
                       &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def       &kp SPACE &kp KP_N0 &kp KP_EQUAL &kp KP_DOT
             >;
         };
