@@ -148,7 +148,7 @@
     keymap {
         compatible = "zmk,keymap";
 
-        /* v6.4.6 synchronized stock/user keymap.
+        /* v6.4.7 synchronized stock/user keymap.
          * v6.4.1 right BB auxiliary buttons:
          * QWERTY/MOUSE: left small button -> QWERTY, right -> RAISE
          * RAISE: either small button -> named to_QWERTY behavior (direct QWERTY switch)
@@ -156,6 +156,7 @@
          * RAISE H/N positions are hard-disabled with &none (not transparent).
          * LOWER + physical Backspace key -> Bluetooth clear (BT_CLR).
          * BB pad press: LCLK on QWERTY/MOUSE/RAISE, RCLK on LOWER/RES.
+         * MOUSE home cluster: H/N = MB1 immediately, J/M = MB2 immediately; no letter output on MOUSE layer.
          */
 
         default_layer {
@@ -198,8 +199,8 @@
             bindings = <
 &kp ESC   &kp N1    &kp N2     &kp N3   &kp N4   &kp N5     &mkp LCLK                        &mkp LCLK       &kp N6     &kp N7         &kp N8    &kp N9    &kp N0   &kp BSPC
 &kp TAB   &kp Q     &kp W      &kp E    &kp R    &kp T                                                        &kp Y      &M_kp MCLK U    &kp I     &kp O     &kp P    &kp BSLH
-&kp CAPS  &kp A     &kp S      &kp D    &kp F    &kp G      &mkp LCLK                        &mkp LCLK        &kp H      &M_kp LCLK J    &kp K     &kp L     &kp SEMI &kp ENTER
-&kp LSHFT &kp Z     &kp X      &kp C    &kp V    &kp B      &msc SCRL_DOWN   &msc SCRL_UP    &to 0  &to 2     &kp N      &M_kp RCLK M    &kp COMMA &kp DOT   &kp FSLH &kp RSHIFT
+&kp CAPS  &kp A     &kp S      &kp D    &kp F    &kp G      &mkp LCLK                        &mkp LCLK        &mkp LCLK   &mkp RCLK    &kp K     &kp L     &kp SEMI &kp ENTER
+&kp LSHFT &kp Z     &kp X      &kp C    &kp V    &kp B      &msc SCRL_DOWN   &msc SCRL_UP    &to 0  &to 2     &mkp LCLK   &mkp RCLK    &kp COMMA &kp DOT   &kp FSLH &kp RSHIFT
                     &kp LCTRL  &kp LGUI &kp LALT &kp SPACE  &mkp LCLK                         &mkp LCLK &tdRMCLK   &kp MINUS      &kp EQUAL    &kp GRAVE
             >;
         };
