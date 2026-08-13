@@ -2,9 +2,11 @@
  * Copyright (c) 2025 ZitaoTech
  * SPDX-License-Identifier: MIT
  *
- * v6.4.6 LED roles:
- * - Board/backlight LED: DPI indicator via ZMK backlight (BL_DEC/BL_INC).
- * - Physical BB touchpad illumination: MOUSE-layer indicator only.
+ * v6.4.12 LED roles:
+ * - Right PCB/backlight LED remains the DPI indicator.
+ * - Left physical BB touchpad LED is steady on MOUSE layer 3.
+ * - Left physical BB touchpad LED restores the original breathing indication
+ *   while Caps Lock is active.
  */
 #pragma once
 
@@ -18,7 +20,7 @@ extern "C" {
 /* Last non-zero ZMK backlight value; A320 uses this as the DPI/speed dial. */
 uint8_t indicator_tp_get_last_valid_brightness(void);
 
-/* Turn the physical BB touchpad illumination on only while MOUSE layer is active. */
+/* Set MOUSE-layer state for the physical left BB touchpad illumination. */
 void indicator_tp_set_mouse_layer(bool active);
 
 #ifdef __cplusplus

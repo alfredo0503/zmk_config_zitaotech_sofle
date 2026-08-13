@@ -2,16 +2,14 @@
  * Copyright (c) 2023 ZitaoTech
  * SPDX-License-Identifier: MIT
  *
- * v6.4.6: separate DPI indicator and touchpad illumination.
+ * v6.4.12: left BB touchpad LED has two independent indications.
  *
- * IMPORTANT:
- * - LOWER + BL_DEC/BL_INC changes ZMK's normal backlight value.  The board LED
- *   beside the battery indicator continues to show that brightness and the A320
- *   driver continues to use the same value as the pointer-speed/DPI dial.
- * - This driver's PWM output is reserved for the physical BB touchpad light.
- *   It is ON only while MOUSE layer 3 is active and OFF immediately otherwise.
- * - Pointer movement itself, DPI changes, USB state and CapsLock do not directly
- *   switch this touchpad light.
+ * - MOUSE layer 3 active: steady touchpad illumination.
+ * - Caps Lock active: restore the seller/original breathing LED animation.
+ * - Caps Lock takes visual priority while it is active; when Caps Lock turns
+ *   off, the LED immediately returns to the current MOUSE-layer state.
+ * - ZMK backlight brightness remains a DPI/speed value only and is not mirrored
+ *   onto this touchpad LED.
  */
 
 #include <zephyr/kernel.h>
@@ -21,7 +19,10 @@
 #include <zephyr/logging/log.h>
 
 #include <zmk/backlight.h>
+#include <zmk/hid_indicators.h>
 #include "trackpad_led.h"
+
+#define HID_INDICATORS_CAPS_LOCK (1 << 1)
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -35,14 +36,24 @@ static const struct device *const led_dev = DEVICE_DT_GET(DT_CHOSEN(zmk_trackpad
 #define TOUCHPAD_LED_NUM_LEDS (DT_NUM_CHILD(DT_CHOSEN(zmk_trackpad_led)))
 
 #define BRT_MIN 10
+#define BRT_MAX 100
+#define BRT_LOW 20
+#define BRT_STEP 5
+#define CAPS_ANIMATION_INTERVAL_MS 20
 #define POLLING_INTERVAL_MS 10
-/* Fixed layer-indicator brightness, intentionally independent from DPI level. */
+
+/* Fixed MOUSE-layer indicator brightness, independent from DPI level. */
 #define TOUCHPAD_MOUSE_LED_BRT 60
 
-static struct k_work_delayable brightness_poll_work;
+static struct k_work_delayable state_poll_work;
+static struct k_work_delayable caps_animation_work;
+
 static uint8_t last_valid_brt = 40;
 static uint8_t last_backlight_brt = 0;
 static bool mouse_layer_led_on = false;
+static bool capslock_on = false;
+static bool caps_animation_increasing = true;
+static uint8_t caps_brightness = BRT_MIN;
 
 static void set_touchpad_led(uint8_t level) {
     if (!device_is_ready(led_dev)) {
@@ -57,18 +68,53 @@ static void set_touchpad_led(uint8_t level) {
     }
 }
 
+static void apply_mouse_layer_led(void) {
+    set_touchpad_led(mouse_layer_led_on ? TOUCHPAD_MOUSE_LED_BRT : 0);
+}
+
 void indicator_tp_set_mouse_layer(bool active) {
     mouse_layer_led_on = active;
-    set_touchpad_led(active ? TOUCHPAD_MOUSE_LED_BRT : 0);
+
+    /* Caps Lock owns the visual indication while it is active. */
+    if (!capslock_on) {
+        apply_mouse_layer_led();
+    }
 }
 
 uint8_t indicator_tp_get_last_valid_brightness(void) { return last_valid_brt; }
 
+/* Original seller Caps Lock breathing animation. */
+static void caps_animation_handler(struct k_work *work) {
+    ARG_UNUSED(work);
+
+    if (!capslock_on) {
+        return;
+    }
+
+    if (caps_animation_increasing) {
+        caps_brightness += BRT_STEP;
+        if (caps_brightness >= BRT_MAX) {
+            caps_brightness = BRT_MAX;
+            caps_animation_increasing = false;
+        }
+    } else {
+        caps_brightness -= BRT_STEP;
+        if (caps_brightness <= BRT_LOW) {
+            caps_brightness = BRT_LOW;
+            caps_animation_increasing = true;
+        }
+    }
+
+    set_touchpad_led(caps_brightness);
+    k_work_reschedule(&caps_animation_work, K_MSEC(CAPS_ANIMATION_INTERVAL_MS));
+}
+
 /*
- * Observe the normal ZMK backlight value only for the A320 DPI/speed dial.
- * Do not mirror that brightness onto the physical touchpad illumination.
+ * Poll two independent states:
+ * 1) normal ZMK backlight value, used only as the A320 DPI/speed dial;
+ * 2) host Caps Lock indicator, used for the original left touchpad LED animation.
  */
-static void brightness_poll_handler(struct k_work *work) {
+static void state_poll_handler(struct k_work *work) {
     ARG_UNUSED(work);
 
     uint8_t brt = zmk_backlight_get_brt();
@@ -79,7 +125,25 @@ static void brightness_poll_handler(struct k_work *work) {
         }
     }
 
-    k_work_reschedule(&brightness_poll_work, K_MSEC(POLLING_INTERVAL_MS));
+    bool current_capslock =
+        (zmk_hid_indicators_get_current_profile() & HID_INDICATORS_CAPS_LOCK) != 0;
+
+    if (current_capslock != capslock_on) {
+        capslock_on = current_capslock;
+
+        if (capslock_on) {
+            caps_brightness = BRT_MIN;
+            caps_animation_increasing = true;
+            k_work_reschedule(&caps_animation_work, K_NO_WAIT);
+            LOG_DBG("Caps Lock on: left BB touchpad breathing LED enabled");
+        } else {
+            k_work_cancel_delayable(&caps_animation_work);
+            apply_mouse_layer_led();
+            LOG_DBG("Caps Lock off: restored MOUSE-layer LED state");
+        }
+    }
+
+    k_work_reschedule(&state_poll_work, K_MSEC(POLLING_INTERVAL_MS));
 }
 
 static int indicator_tp_init(void) {
@@ -95,10 +159,14 @@ static int indicator_tp_init(void) {
     last_backlight_brt = boot_brt;
 
     mouse_layer_led_on = false;
+    capslock_on = false;
+    caps_animation_increasing = true;
+    caps_brightness = BRT_MIN;
     set_touchpad_led(0);
 
-    k_work_init_delayable(&brightness_poll_work, brightness_poll_handler);
-    k_work_reschedule(&brightness_poll_work, K_NO_WAIT);
+    k_work_init_delayable(&state_poll_work, state_poll_handler);
+    k_work_init_delayable(&caps_animation_work, caps_animation_handler);
+    k_work_reschedule(&state_poll_work, K_NO_WAIT);
 
     return 0;
 }
