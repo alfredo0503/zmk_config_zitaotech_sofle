@@ -169,7 +169,7 @@ layers:
   - {t: ▽, type: trans}
   - '&mkp LCLK'
   - '&mkp LCLK'
-  - {t: ▽, type: trans}
+  - ''
   - KP 4
   - KP 5
   - KP 6
@@ -185,7 +185,7 @@ layers:
   - {t: ▽, type: trans}
   - '&to_def'
   - '&to_def'
-  - {t: ▽, type: trans}
+  - ''
   - KP 1
   - KP 2
   - KP 3
