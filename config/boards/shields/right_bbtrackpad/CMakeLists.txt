@@ -1,6 +1,7 @@
 zephyr_library()
 zephyr_library_sources(custom_driver_right/a320.c)
 zephyr_library_sources(custom_driver_right/custom_led.c)
+zephyr_library_sources(custom_driver_right/behavior_mouse_led_sync.c)
 zephyr_library_include_directories(${ZEPHYR_BASE}/drivers)
 zephyr_library_include_directories(../../../include)
 zephyr_library_include_directories(${CMAKE_SOURCE_DIR}/include)

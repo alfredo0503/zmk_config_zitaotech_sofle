@@ -31,6 +31,15 @@ RC(3,0)  RC(3,1) RC(3,2) RC(3,3) RC(3,4) RC(3,5)  RC(5,7)  RC(5,6)    RC(5,15) R
     };
 };
 
+/ {
+    behaviors {
+        mled: mled {
+            compatible = "zmk,behavior-mouse-led-sync";
+            #binding-cells = <0>;
+        };
+    };
+};
+
 &pwm1 {
     status = "okay";
     pinctrl-0 = <&pwm1_default>;

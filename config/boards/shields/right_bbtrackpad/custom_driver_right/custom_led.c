@@ -1,14 +1,14 @@
 /*
- * Right BB trackpad LED / DPI helper.
+ * Right BB trackpad LED / DPI helper - v6.4.6.
  *
- * v6.4.5: DPI feedback only.
- * - Backlight brightness remains the A320 pointer-speed/DPI dial.
- * - A brightness change lights the right LED at that level for 5 seconds.
- * - Pointer motion and MOUSE-layer activation do not control the LED.
+ * - ZMK backlight brightness remains the A320 pointer-speed/DPI dial.
+ * - The physical right BB touchpad illumination is ON only while MOUSE layer
+ *   is active and OFF immediately on every other layer.
+ * - DPI changes do not directly illuminate the touchpad.
  *
- * Note: the current right BB LED PWM pin is still based on the earlier
- * hardware assumption. If that pin does not drive the physical LED, this
- * helper simply has no visible LED output; A320 motion remains unaffected.
+ * NOTE: the right touchpad LED PWM pin is still the existing right-BB hardware
+ * assumption.  If the physical right pad does not illuminate, its real LED pin
+ * still needs hardware identification; this does not affect A320 movement.
  */
 
 #include <zephyr/kernel.h>
@@ -33,14 +33,14 @@ static const struct device *const led_dev = DEVICE_DT_GET(DT_CHOSEN(zmk_custom_l
 
 #define BRT_MIN 10
 #define POLLING_INTERVAL_MS 10
-#define DPI_FEEDBACK_HOLD_MS 5000
+#define TOUCHPAD_MOUSE_LED_BRT 60
 
 static struct k_work_delayable brightness_poll_work;
-static struct k_work_delayable dpi_feedback_off_work;
 static uint8_t last_valid_brt = 40;
 static uint8_t last_backlight_brt = 0;
+static bool mouse_layer_led_on = false;
 
-static void apply_led(uint8_t level) {
+static void apply_touchpad_led(uint8_t level) {
     if (!device_is_ready(led_dev)) {
         return;
     }
@@ -48,32 +48,26 @@ static void apply_led(uint8_t level) {
     for (int i = 0; i < LED_NUM; i++) {
         int err = led_set_brightness(led_dev, i, level);
         if (err < 0) {
-            LOG_ERR("Failed to set right trackpad LED[%d] brightness: %d", i, err);
+            LOG_ERR("Failed to set right BB touchpad LED[%d] brightness: %d", i, err);
         }
     }
 }
 
-uint8_t custom_led_get_last_valid_brightness(void) { return last_valid_brt; }
-
-static void dpi_feedback_off_handler(struct k_work *work) {
-    ARG_UNUSED(work);
-    apply_led(0);
+void custom_led_set_mouse_layer(bool active) {
+    mouse_layer_led_on = active;
+    apply_touchpad_led(active ? TOUCHPAD_MOUSE_LED_BRT : 0);
 }
+
+uint8_t custom_led_get_last_valid_brightness(void) { return last_valid_brt; }
 
 static void brightness_poll_handler(struct k_work *work) {
     ARG_UNUSED(work);
-    uint8_t brt = zmk_backlight_get_brt();
 
+    uint8_t brt = zmk_backlight_get_brt();
     if (brt != last_backlight_brt) {
         last_backlight_brt = brt;
-
         if (brt > 0) {
             last_valid_brt = MAX(BRT_MIN, brt);
-            apply_led(last_valid_brt);
-            k_work_reschedule(&dpi_feedback_off_work, K_MSEC(DPI_FEEDBACK_HOLD_MS));
-        } else {
-            k_work_cancel_delayable(&dpi_feedback_off_work);
-            apply_led(0);
         }
     }
 
@@ -82,7 +76,7 @@ static void brightness_poll_handler(struct k_work *work) {
 
 static int init_led_follow(void) {
     if (!device_is_ready(led_dev)) {
-        LOG_ERR("Right trackpad LED device not ready");
+        LOG_ERR("Right BB touchpad LED device not ready");
         return -ENODEV;
     }
 
@@ -92,9 +86,10 @@ static int init_led_follow(void) {
     }
     last_backlight_brt = boot_brt;
 
-    apply_led(0);
+    mouse_layer_led_on = false;
+    apply_touchpad_led(0);
+
     k_work_init_delayable(&brightness_poll_work, brightness_poll_handler);
-    k_work_init_delayable(&dpi_feedback_off_work, dpi_feedback_off_handler);
     k_work_reschedule(&brightness_poll_work, K_NO_WAIT);
 
     return 0;
