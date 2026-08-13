@@ -5,6 +5,10 @@ include:
 
   - board: zitaotech_sofle_left
     shield: lpm_view;left_bbtrackpad
+    # ZMK Studio over USB: enable only on the split Central (left) side.
+    snippet: studio-rpc-usb-uart
+    # Locking is disabled so Studio can edit immediately without consuming a key for &studio_unlock.
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_STUDIO_LOCKING=n
 
 
     

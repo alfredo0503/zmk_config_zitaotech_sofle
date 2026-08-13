@@ -1,0 +1,22 @@
+ZMK Studio USB enable patch v6.2
+
+Changes:
+- build.yaml only
+- Enables ZMK Studio USB RPC only for the current Central build:
+    board: zitaotech_sofle_left
+    shield: lpm_view;left_bbtrackpad
+- snippet: studio-rpc-usb-uart
+- cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_ZMK_STUDIO_LOCKING=n
+
+Unchanged:
+- right_bbtrackpad firmware
+- A320 movement / DPI / scroll tuning
+- LED logic
+- keymap / click mappings
+
+After a successful GitHub Actions build, flash ONLY the normal left BB trackpad UF2 for Studio support:
+  lpm_view;left_bbtrackpad-zitaotech_sofle_left-zmk.uf2
+The right half does not need Studio firmware changes because it is the split Peripheral.
+
+Test with Chrome or Edge at zmk.studio over USB.
+If connected to PC by both BLE and USB, select USB output on the keyboard first.
