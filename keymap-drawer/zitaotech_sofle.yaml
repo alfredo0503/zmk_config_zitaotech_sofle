@@ -236,8 +236,8 @@ layers:
   - G
   - '&mkp LCLK'
   - '&mkp LCLK'
-  - H
-  - {t: J, h: '&mkp LCLK'}
+  - '&mkp LCLK'
+  - '&mkp RCLK'
   - K
   - L
   - ;
@@ -252,8 +252,8 @@ layers:
   - '&msc SCRL_UP'
   - {t: QWERTY, h: toggle}
   - {t: RAISE NUMPAD, h: toggle}
-  - N
-  - {t: M, h: '&mkp RCLK'}
+  - '&mkp LCLK'
+  - '&mkp RCLK'
   - ','
   - .
   - /
