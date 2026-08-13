@@ -5,15 +5,14 @@
  */
 #pragma once
 
-#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/* Last non-zero software backlight value, used by A320 as the DPI/speed dial. */
 uint8_t indicator_tp_get_last_valid_brightness(void);
-void indicator_tp_set_mouse_layer(bool active);
 
 #ifdef __cplusplus
 }

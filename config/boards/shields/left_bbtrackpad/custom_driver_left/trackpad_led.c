@@ -3,9 +3,13 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * v4: The physical trackpad LED is now a pure MOUSE-layer indicator.
- *     Pointer sensitivity still follows ZMK's (dummy) backlight brightness,
- *     but touch/CapsLock/USB activity no longer controls this LED.
+ * v6.4.5: DPI feedback LED only.
+ * - LOWER + BL_DEC/BL_INC still changes the software backlight value used by
+ *   the A320 driver as the pointer-speed/DPI dial.
+ * - A brightness change lights this LED at the corresponding level for a
+ *   short period, so the user can gauge the selected DPI by LED brightness.
+ * - Pointer motion, MOUSE-layer activation, CapsLock and USB mode do NOT
+ *   control this LED.
  */
 
 #include <zephyr/kernel.h>
@@ -30,11 +34,12 @@ static const struct device *const led_dev = DEVICE_DT_GET(DT_CHOSEN(zmk_trackpad
 
 #define BRT_MIN 10
 #define POLLING_INTERVAL_MS 10
+#define DPI_FEEDBACK_HOLD_MS 5000
 
 static struct k_work_delayable brightness_poll_work;
+static struct k_work_delayable dpi_feedback_off_work;
 static uint8_t last_valid_brt = 40;
 static uint8_t last_backlight_brt = 0;
-static bool mouse_layer_led_on = false;
 
 static void set_led_brightness(uint8_t level) {
     if (!device_is_ready(led_dev)) {
@@ -49,28 +54,27 @@ static void set_led_brightness(uint8_t level) {
     }
 }
 
-void indicator_tp_set_mouse_layer(bool active) {
-    mouse_layer_led_on = active;
-    set_led_brightness(active ? MAX(BRT_MIN, last_valid_brt) : 0);
-}
-
 uint8_t indicator_tp_get_last_valid_brightness(void) { return last_valid_brt; }
 
-/*
- * The board's ZMK backlight is intentionally a software/DPI channel.
- * Keep reading its brightness so LOWER + BL_DEC/BL_INC continues to tune
- * pointer sensitivity exactly as before, without using it as LED on/off state.
- */
+static void dpi_feedback_off_handler(struct k_work *work) {
+    ARG_UNUSED(work);
+    set_led_brightness(0);
+}
+
 static void brightness_poll_handler(struct k_work *work) {
+    ARG_UNUSED(work);
     uint8_t brt = zmk_backlight_get_brt();
 
     if (brt != last_backlight_brt) {
         last_backlight_brt = brt;
+
         if (brt > 0) {
             last_valid_brt = MAX(BRT_MIN, brt);
-            if (mouse_layer_led_on) {
-                set_led_brightness(last_valid_brt);
-            }
+            set_led_brightness(last_valid_brt);
+            k_work_reschedule(&dpi_feedback_off_work, K_MSEC(DPI_FEEDBACK_HOLD_MS));
+        } else {
+            k_work_cancel_delayable(&dpi_feedback_off_work);
+            set_led_brightness(0);
         }
     }
 
@@ -88,10 +92,10 @@ static int indicator_tp_init(void) {
         last_valid_brt = MAX(BRT_MIN, boot_brt);
     }
     last_backlight_brt = boot_brt;
-    mouse_layer_led_on = false;
-    set_led_brightness(0);
 
+    set_led_brightness(0);
     k_work_init_delayable(&brightness_poll_work, brightness_poll_handler);
+    k_work_init_delayable(&dpi_feedback_off_work, dpi_feedback_off_handler);
     k_work_reschedule(&brightness_poll_work, K_NO_WAIT);
 
     return 0;

@@ -24,15 +24,6 @@
         };
     };
 
-    behaviors {
-        /* Must exist in each half's devicetree so GLOBAL locality can invoke
-         * the same behavior by name on the split peripheral.
-         */
-        mled: mled {
-            compatible = "zmk,behavior-mouse-led-sync";
-            #binding-cells = <0>;
-        };
-    };
 };
 
 &pwm1 {
