@@ -143,8 +143,8 @@ layers:
   - F5
   - '&mkp LCLK'
   - '&mkp LCLK'
-  - F6
-  - F7
+  - ''
+  - ''
   - KP DIVIDE
   - KP MULTIPLY
   - KP MINUS
@@ -155,7 +155,7 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - OUT TOG
-  - F11
+  - ''
   - KP 7
   - KP 8
   - KP 9
@@ -173,7 +173,7 @@ layers:
   - KP 4
   - KP 5
   - KP 6
-  - '6'
+  - ''
   - ENTER
   - LSHFT
   - {t: ▽, type: trans}
@@ -189,7 +189,7 @@ layers:
   - KP 1
   - KP 2
   - KP 3
-  - '3'
+  - ''
   - RSHIFT
   - LCTRL
   - LGUI
