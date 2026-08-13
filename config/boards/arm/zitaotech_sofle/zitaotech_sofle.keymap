@@ -148,10 +148,10 @@
     keymap {
         compatible = "zmk,keymap";
 
-        /* v6.4.2 synchronized stock/user keymap.
+        /* v6.4.3 synchronized stock/user keymap.
          * v6.4.1 right BB auxiliary buttons:
          * QWERTY/MOUSE: left small button -> QWERTY, right -> RAISE
-         * RAISE: either small button -> QWERTY
+         * RAISE: either small button -> named to_QWERTY behavior (direct QWERTY switch)
          * LOWER keeps BL_DEC/BL_INC for trackpad sensitivity tuning.
          * LOWER + physical Backspace key -> Bluetooth clear (BT_CLR).
          * BB pad press: LCLK on QWERTY/MOUSE/RAISE, RCLK on LOWER/RES.
@@ -187,8 +187,8 @@
 &kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &mkp LCLK                    &mkp LCLK              &kp F6    &kp F7    &kp KP_DIVIDE   &kp KP_MULTIPLY &kp KP_MINUS &kp BSPC
 &kp TAB     &trans    &kp UP     &trans    &trans    &out OUT_TOG                                                          &kp F11   &kp KP_N7  &kp KP_N8       &kp KP_N9       &kp KP_PLUS  &kp BSLH
 &kp CAPS    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp LCLK                    &mkp LCLK              &trans    &kp KP_N4 &kp KP_N5       &kp KP_N6       &kp N6       &kp ENTER
-&kp LSHFT   &trans    &trans     &trans    &trans    &rgb_ug RGB_TOG  &trans      &trans           &to 0    &to 0          &trans    &kp KP_N1 &kp KP_N2       &kp KP_N3       &kp N3       &kp RSHIFT
-                      &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def       &kp SPACE &kp KP_N0 &kp KP_EQUAL &kp KP_DOT
+&kp LSHFT   &trans    &trans     &trans    &trans    &rgb_ug RGB_TOG  &trans      &trans           &to_def  &to_def        &trans    &kp KP_N1 &kp KP_N2       &kp KP_N3       &kp N3       &kp RSHIFT
+                      &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def       &kp SPACE &kp KP_N0 &kp EQUAL    &kp KP_DOT
             >;
         };
 
