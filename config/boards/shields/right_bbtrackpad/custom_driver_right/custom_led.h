@@ -1,13 +1,12 @@
 /*
- * Right BB trackpad LED/DPI helper - v6.4.6.
+ * Right BB board DPI-indicator helper - v6.4.9.
  *
- * The ZMK backlight value remains the DPI/speed dial.  The separate physical
- * touchpad illumination is used only as a MOUSE-layer indicator.
+ * The small PCB LED beside the battery/charge indicator displays the current
+ * DPI/speed level only when that level is adjusted.  It is intentionally not
+ * tied to the MOUSE layer.
  */
 #pragma once
 
-#include <stdbool.h>
 #include <stdint.h>
 
 uint8_t custom_led_get_last_valid_brightness(void);
-void custom_led_set_mouse_layer(bool active);

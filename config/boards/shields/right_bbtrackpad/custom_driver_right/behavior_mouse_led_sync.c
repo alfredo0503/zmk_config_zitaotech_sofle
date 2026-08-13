@@ -1,29 +1,36 @@
-/* Global mouse-layer LED synchronization behavior, peripheral implementation. */
+/*
+ * Right-half implementation of the global MOUSE-layer LED behavior - v6.4.9.
+ *
+ * The global behavior still needs to exist on the peripheral so the split
+ * behavior can be invoked safely.  However, the user's right-side P0.04 LED
+ * is the PCB DPI indicator beside the battery/charge LED, NOT a touchpad
+ * MOUSE-layer indicator.  Therefore MOUSE-layer ON/OFF is intentionally a
+ * no-op on the right half.
+ *
+ * Only the LEFT BB touchpad illumination follows MOUSE layer 3.
+ */
 
 #define DT_DRV_COMPAT zmk_behavior_mouse_led_sync
 
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
-#include <zephyr/logging/log.h>
 
 #include <drivers/behavior.h>
 #include <zmk/behavior.h>
-
-#include "custom_led.h"
-
-LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #if DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)
 
 static int mouse_led_pressed(struct zmk_behavior_binding *binding,
                              struct zmk_behavior_binding_event event) {
-    custom_led_set_mouse_layer(true);
+    ARG_UNUSED(binding);
+    ARG_UNUSED(event);
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
 static int mouse_led_released(struct zmk_behavior_binding *binding,
                               struct zmk_behavior_binding_event event) {
-    custom_led_set_mouse_layer(false);
+    ARG_UNUSED(binding);
+    ARG_UNUSED(event);
     return ZMK_BEHAVIOR_OPAQUE;
 }
 
