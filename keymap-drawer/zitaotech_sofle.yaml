@@ -183,8 +183,8 @@ layers:
   - RGB TOG
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {t: QWERTY, h: toggle}
-  - {t: QWERTY, h: toggle}
+  - '&to_def'
+  - '&to_def'
   - {t: ▽, type: trans}
   - KP 1
   - KP 2
@@ -199,7 +199,7 @@ layers:
   - '&to_def'
   - SPACE
   - KP 0
-  - KP EQUAL
+  - '='
   - KP DOT
   MOUSE:
   - ESC
