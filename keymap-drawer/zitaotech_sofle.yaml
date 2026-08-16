@@ -81,7 +81,7 @@ layers:
   - F8
   - F9
   - F10
-  - BT CLR
+  - DEL
   - DEL
   - VOL DN
   - UP
@@ -141,8 +141,8 @@ layers:
   - F3
   - F4
   - F5
-  - '&mkp LCLK'
-  - '&mkp LCLK'
+  - BT CLR
+  - BT CLR
   - ''
   - ''
   - KP DIVIDE
