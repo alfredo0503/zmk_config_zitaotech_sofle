@@ -22,6 +22,7 @@
 #include <zmk/events/hid_indicators_changed.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <zmk/hid.h>
+#include <zmk/keymap.h>
 
 #include "trackpad_led.h"
 #include "a320.h"
@@ -51,6 +52,8 @@ static struct k_work_q a320_workq;
 #define SCROLL_INPUT_MAX CONFIG_A320_SCROLL_INPUT_MAX
 #define SCROLL_DIVISOR_SLOW CONFIG_A320_SCROLL_DIVISOR_SLOW
 #define SCROLL_DIVISOR_FAST CONFIG_A320_SCROLL_DIVISOR_FAST
+#define LOWER_SCROLL_DIVISOR_SLOW CONFIG_A320_LOWER_SCROLL_DIVISOR_SLOW
+#define LOWER_SCROLL_DIVISOR_FAST CONFIG_A320_LOWER_SCROLL_DIVISOR_FAST
 
 // --- Arrow key threshold / divisor ---
 #define ARROW_DEADZONE CONFIG_A320_SCROLL_DEADZONE
@@ -76,6 +79,7 @@ static struct k_work_q a320_workq;
 /* ========= A320 常量 ========= */
 #define A320_I2C_ADDR 0x3B
 #define A320_PACKET_LEN 3
+#define LOWER_LAYER_ID 1
 
 #define SLOW_KEY_MULTIPLIER 0.5f
 #define TOUCH_IDLE_TIMEOUT 50 // 30~80ms 看手感
@@ -86,7 +90,7 @@ static uint32_t last_activity_time = 0;
 static bool scroll_key_pressed = false;
 static bool arrow_key_pressed = false;
 static bool slow_key_pressed = false;
-static bool last_scroll_key_pressed = false; // ★ NEW
+static bool last_lower_scroll_active = false; // physical hold OR actual LOWER layer
 static bool last_arrow_key_pressed = false;
 uint32_t last_packet_time = 0;
 static bool touched = false;
@@ -182,7 +186,8 @@ out:
 
 /* ========= ★ 抽象复用：滚轮单轴处理函数 ========= */
 static inline void process_scroll_axis(const struct device *dev, int8_t delta, int16_t *residue,
-                                       uint16_t input_code, int8_t dir_mult) {
+                                       uint16_t input_code, int8_t dir_mult,
+                                       int divisor_slow, int divisor_fast) {
     int abs_delta = abs(delta);
 
     // ★ 不清零，保持连续性
@@ -198,7 +203,7 @@ static inline void process_scroll_axis(const struct device *dev, int8_t delta, i
     float t = (float)abs_delta / SCROLL_INPUT_MAX;
     t = t * t;
 
-    float f_div = SCROLL_DIVISOR_SLOW - (SCROLL_DIVISOR_SLOW - SCROLL_DIVISOR_FAST) * t;
+    float f_div = divisor_slow - (divisor_slow - divisor_fast) * t;
 
     int divisor = (int)f_div;
     if (divisor < 1)
@@ -270,7 +275,7 @@ static void a320_work_cb(struct k_work *work) {
         data->arrow_residue_x = 0;
         data->arrow_residue_y = 0;
 
-        last_scroll_key_pressed = scroll_key_pressed;
+        last_lower_scroll_active = scroll_key_pressed || zmk_keymap_layer_active(LOWER_LAYER_ID);
         last_arrow_key_pressed = arrow_key_pressed;
 
         touched = false;
@@ -322,7 +327,9 @@ static void a320_work_cb(struct k_work *work) {
     dy = total_dy;
 
     /* ========= scroll / arrow mode 切换检测 ========= */
-    bool just_enter_scroll = scroll_key_pressed && !last_scroll_key_pressed;
+    bool lower_layer_active = zmk_keymap_layer_active(LOWER_LAYER_ID);
+    bool lower_scroll_active = scroll_key_pressed || lower_layer_active;
+    bool just_enter_scroll = lower_scroll_active && !last_lower_scroll_active;
     bool just_enter_arrow = arrow_key_pressed && !last_arrow_key_pressed;
     bool capslock = current_indicators & HID_INDICATORS_CAPS_LOCK;
 
@@ -348,7 +355,7 @@ static void a320_work_cb(struct k_work *work) {
         process_arrow_axis(dev, dx, &data->arrow_residue_x, INPUT_BTN_1, INPUT_BTN_0);
 
         process_arrow_axis(dev, dy, &data->arrow_residue_y, INPUT_BTN_3, INPUT_BTN_2);
-    } else if (scroll_key_pressed || capslock) {
+    } else if (lower_scroll_active || capslock) {
 
         if (just_enter_scroll) {
             data->scroll_residue_x = dx * SCROLL_X_DIR;
@@ -367,9 +374,20 @@ static void a320_work_cb(struct k_work *work) {
             dy = 0;
         }
 
-        process_scroll_axis(dev, -1 * dx, &data->scroll_residue_x, INPUT_REL_HWHEEL, SCROLL_X_DIR);
+        /*
+         * Caps Lock remains the fast scroll mode (15/2). LOWER uses the
+         * calmer wheel-like profile (50/7). Detect the actual LOWER layer as
+         * well as a physically held LOWER key, so a latched/fixed LOWER layer
+         * keeps 50/7 and takes precedence over Caps Lock.
+         */
+        int scroll_divisor_slow = lower_scroll_active ? LOWER_SCROLL_DIVISOR_SLOW : SCROLL_DIVISOR_SLOW;
+        int scroll_divisor_fast = lower_scroll_active ? LOWER_SCROLL_DIVISOR_FAST : SCROLL_DIVISOR_FAST;
 
-        process_scroll_axis(dev, -1 * dy, &data->scroll_residue_y, INPUT_REL_WHEEL, SCROLL_Y_DIR);
+        process_scroll_axis(dev, -1 * dx, &data->scroll_residue_x, INPUT_REL_HWHEEL, SCROLL_X_DIR,
+                            scroll_divisor_slow, scroll_divisor_fast);
+
+        process_scroll_axis(dev, -1 * dy, &data->scroll_residue_y, INPUT_REL_WHEEL, SCROLL_Y_DIR,
+                            scroll_divisor_slow, scroll_divisor_fast);
     } else if (!capslock) {
 
         uint8_t a320_led_brt = indicator_tp_get_last_valid_brightness();
@@ -393,7 +411,7 @@ static void a320_work_cb(struct k_work *work) {
         touched = false;
     }
 
-    last_scroll_key_pressed = scroll_key_pressed;
+    last_lower_scroll_active = lower_scroll_active;
     last_arrow_key_pressed = arrow_key_pressed;
     touched = false;
     data->last_packet_time = now;

@@ -78,6 +78,14 @@ config A320_SCROLL_DIVISOR_FAST
     int "Scroll divisor fast (Max speed limit)"
     default 2
 
+config A320_LOWER_SCROLL_DIVISOR_SLOW
+    int "LOWER scroll divisor slow (Fine-grained control)"
+    default 50
+
+config A320_LOWER_SCROLL_DIVISOR_FAST
+    int "LOWER scroll divisor fast (Max speed limit)"
+    default 7
+
 config A320_DOMINANT_NUMERATOR
     int "Dominant axis numerator for accidental touch prevention"
     default 3
