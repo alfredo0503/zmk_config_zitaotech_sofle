@@ -22,9 +22,9 @@
 #include <zmk/events/hid_indicators_changed.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 #include <zmk/hid.h>
-#include <zmk/keymap.h>
 
 #include "custom_led.h"
+#include "lower_scroll_sync.h"
 #include "a320.h"
 
 LOG_MODULE_REGISTER(a320, CONFIG_A320_LOG_LEVEL);
@@ -79,7 +79,6 @@ static struct k_work_q a320_workq;
 /* ========= A320 常量 ========= */
 #define A320_I2C_ADDR 0x3B
 #define A320_PACKET_LEN 3
-#define LOWER_LAYER_ID 1
 
 #define SLOW_KEY_MULTIPLIER 0.5f
 #define TOUCH_IDLE_TIMEOUT 50 // 30~80ms 看手感
@@ -90,7 +89,7 @@ static uint32_t last_activity_time = 0;
 static bool scroll_key_pressed = false;
 static bool arrow_key_pressed = false;
 static bool slow_key_pressed = false;
-static bool last_lower_scroll_active = false; // physical hold OR actual LOWER layer
+static bool last_lower_scroll_active = false; // physical hold OR split-synchronized actual LOWER layer
 static bool last_arrow_key_pressed = false;
 uint32_t last_packet_time = 0;
 static bool touched = false;
@@ -275,7 +274,7 @@ static void a320_work_cb(struct k_work *work) {
         data->arrow_residue_x = 0;
         data->arrow_residue_y = 0;
 
-        last_lower_scroll_active = scroll_key_pressed || zmk_keymap_layer_active(LOWER_LAYER_ID);
+        last_lower_scroll_active = scroll_key_pressed || lower_scroll_sync_is_active();
         last_arrow_key_pressed = arrow_key_pressed;
 
         touched = false;
@@ -328,7 +327,7 @@ static void a320_work_cb(struct k_work *work) {
     dy = total_dy;
 
     /* ========= scroll / arrow mode 切换检测 ========= */
-    bool lower_layer_active = zmk_keymap_layer_active(LOWER_LAYER_ID);
+    bool lower_layer_active = lower_scroll_sync_is_active();
     bool lower_scroll_active = scroll_key_pressed || lower_layer_active;
     bool just_enter_scroll = lower_scroll_active && !last_lower_scroll_active;
     bool just_enter_arrow = arrow_key_pressed && !last_arrow_key_pressed;
@@ -377,7 +376,7 @@ static void a320_work_cb(struct k_work *work) {
 
         /*
          * Caps Lock remains the fast scroll mode (15/2). LOWER uses the
-         * calmer wheel-like profile (50/7). Detect the actual LOWER layer as
+         * calmer wheel-like profile (50/7). Detect the split-synchronized actual LOWER layer as
          * well as a physically held LOWER key, so a latched/fixed LOWER layer
          * keeps 50/7 and takes precedence over Caps Lock.
          */

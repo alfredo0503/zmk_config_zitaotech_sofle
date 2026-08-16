@@ -1,0 +1,3 @@
+description: Synchronize LOWER-layer scroll mode across split halves
+compatible: "zmk,behavior-lower-scroll-sync"
+include: zero_param.yaml
