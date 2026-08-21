@@ -47,8 +47,8 @@ layers:
   - C
   - V
   - B
-  - PREV
-  - NEXT
+  - PG DN
+  - PG UP
   - {t: QWERTY, h: toggle}
   - {t: RAISE NUMPAD, h: toggle}
   - N
