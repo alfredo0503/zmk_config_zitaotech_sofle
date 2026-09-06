@@ -12,16 +12,6 @@
 #include "zitaotech_sofle-layouts.dtsi"
 
 
-
-/ {
-    behaviors {
-        kbl: keyboard_backlight_sync {
-            compatible = "zmk,behavior-keyboard-backlight-sync";
-            #binding-cells = <1>;
-        };
-    };
-};
-
 / {
     model = "zitaotech_sofle";
     compatible = "ZitaoTech,zitaotech-sofle";

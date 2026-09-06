@@ -13,7 +13,7 @@
 #include <zmk/rgb_underglow.h>
 #include <zmk/backlight.h>
 
-#include "keyboard_backlight_control.h"
+#include "../keyboard_backlight_control.h"
 
 LOG_MODULE_REGISTER(keyboard_backlight, CONFIG_ZMK_LOG_LEVEL);
 
@@ -47,7 +47,6 @@ enum bl_state {
 
 static enum bl_state bl_state = BL_OFF;
 static int current_brt;
-static bool backlight_enabled;
 
 /* activity */
 static int64_t last_activity_ms;
@@ -64,6 +63,7 @@ static struct k_work_delayable bl_work;
 static struct k_work_delayable idle_off_work;
 static struct k_work_delayable wpm_work;
 static struct k_work_delayable boot_work;
+static struct k_work_delayable split_sync_work;
 
 /* =========================================================
  * LED control
@@ -77,8 +77,6 @@ static void set_brightness(int brt) {
     current_brt = brt;
 }
 
-static void trigger_activity(void);
-
 static void force_off(void) {
     bl_state = BL_OFF;
     set_brightness(MIN_BRT);
@@ -90,7 +88,13 @@ static void force_off(void) {
 static void bl_work_handler(struct k_work *work) {
     ARG_UNUSED(work);
 
-    if (!backlight_enabled) {
+    bool rgb_on = true;
+
+#if IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
+    zmk_rgb_underglow_get_state(&rgb_on);
+#endif
+
+    if (!rgb_on) {
         force_off();
         return;
     }
@@ -132,7 +136,7 @@ static void bl_work_handler(struct k_work *work) {
 static void trigger_activity(void) {
     last_activity_ms = k_uptime_get();
 
-    if (!backlight_enabled || !device_is_ready(backlight_dev))
+    if (!device_is_ready(backlight_dev))
         return;
 
     if (bl_state == BL_OFF || bl_state == BL_FADING_DOWN) {
@@ -145,14 +149,28 @@ static void trigger_activity(void) {
     k_work_reschedule(&idle_off_work, K_MSEC(timeout));
 }
 
-bool keyboard_backlight_is_enabled(void) { return backlight_enabled; }
+/* =========================================================
+ * Split-synchronized activity / RGB toggle mirror
+ *
+ * The stock &rgb_ug RGB_TOG behavior is already GLOBAL in ZMK, so it is
+ * the source of truth for ON/OFF on both halves. A BB-trackpad split behavior
+ * broadcasts every key press to both halves. We wait 75 ms so RGB_TOG has
+ * time to settle, then:
+ *   RGB OFF -> force the physical keyboard backlight off immediately.
+ *   RGB ON  -> light/wake it and refresh the 30 s idle timer.
+ * ========================================================= */
+static void split_sync_work_handler(struct k_work *work) {
+    ARG_UNUSED(work);
 
-void keyboard_backlight_activity(void) { trigger_activity(); }
+    bool rgb_on = true;
 
-void keyboard_backlight_set_enabled(bool enabled) {
-    backlight_enabled = enabled;
+#if IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
+    if (zmk_rgb_underglow_get_state(&rgb_on) != 0) {
+        return;
+    }
+#endif
 
-    if (!enabled) {
+    if (!rgb_on) {
         k_work_cancel_delayable(&idle_off_work);
         k_work_cancel_delayable(&bl_work);
         force_off();
@@ -160,6 +178,12 @@ void keyboard_backlight_set_enabled(bool enabled) {
     }
 
     trigger_activity();
+}
+
+void keyboard_backlight_sync_activity(void) {
+    /* Visually immediate, while avoiding the LOWER+B ordering race where
+     * the position event can arrive just before RGB_TOG is applied. */
+    k_work_reschedule(&split_sync_work, K_MSEC(75));
 }
 
 /* =========================================================
@@ -237,29 +261,23 @@ static int keyboard_backlight_init(void) {
     set_brightness(current_brt);
 
     last_activity_ms = k_uptime_get();
-    last_rgb_on = false;
-    backlight_enabled = false;
-
-#if IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
-    if (zmk_rgb_underglow_get_state(&last_rgb_on) == 0) {
-        backlight_enabled = last_rgb_on;
-    }
-#endif
+    last_rgb_on = true;
 
     k_work_init_delayable(&bl_work, bl_work_handler);
     k_work_init_delayable(&idle_off_work, idle_off_handler);
     k_work_init_delayable(&wpm_work, wpm_work_handler);
     k_work_init_delayable(&boot_work, boot_work_handler);
+    k_work_init_delayable(&split_sync_work, split_sync_work_handler);
 
     /* ⭐ 启动 WPM */
     k_work_schedule(&wpm_work, K_SECONDS(1));
 
-    /* If the saved backlight mode is ON, preserve the existing boot preview. */
-    if (backlight_enabled) {
-        bl_state = BL_FADING_UP;
-        k_work_schedule(&bl_work, K_NO_WAIT);
-        k_work_schedule(&idle_off_work, K_MSEC(BOOT_FADE_DELAY_MS));
-    }
+    /* ⭐ 开机：先亮 */
+    bl_state = BL_FADING_UP;
+    k_work_schedule(&bl_work, K_NO_WAIT);
+
+    /* ⭐ 延迟自动灭（模拟 boot fade）*/
+    k_work_schedule(&idle_off_work, K_MSEC(BOOT_FADE_DELAY_MS));
 
     LOG_INF("Keyboard backlight EVENT-driven (no polling) initialized");
     return 0;

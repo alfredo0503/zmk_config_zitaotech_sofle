@@ -1,7 +1,9 @@
 #pragma once
 
-#include <stdbool.h>
-
-bool keyboard_backlight_is_enabled(void);
-void keyboard_backlight_set_enabled(bool enabled);
-void keyboard_backlight_activity(void);
+/*
+ * Called by the BB-trackpad GLOBAL split behavior on both halves.
+ * The implementation waits briefly for the built-in RGB_TOG command to
+ * settle, then mirrors that global RGB on/off state to the physical keyboard
+ * backlight and refreshes the 30 s idle timer.
+ */
+void keyboard_backlight_sync_activity(void);

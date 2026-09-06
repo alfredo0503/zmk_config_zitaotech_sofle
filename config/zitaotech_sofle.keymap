@@ -180,7 +180,7 @@
 &kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &mkp RCLK                    &mkp RCLK             &kp F6    &kp F7   &kp F8     &kp F9    &kp F10    &kp DEL
 &kp DEL     &kp C_VOL_DN &kp UP  &kp C_VOL_UP &trans &out OUT_TOG                                                         &kp F11   &kp F12  &kp UP     &trans    &kp HOME   &kp BSLH
 &kp BSPC    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp RCLK                    &mkp RCLK              &trans    &kp LEFT &kp DOWN   &kp RIGHT &kp APOS   &kp ENTER
-&kp LSHFT   &kp ENTER &trans     &trans    &trans    &kbl 0  &bt BT_PRV   &bt BT_NXT      &bl BL_DEC  &bl BL_INC &trans    &trans   &kp LBKT   &kp RBKT  &kp FSLH   &kp RSHIFT
+&kp LSHFT   &kp ENTER &trans     &trans    &trans    &rgb_ug RGB_TOG  &bt BT_PRV   &bt BT_NXT      &bl BL_DEC  &bl BL_INC &trans    &trans   &kp LBKT   &kp RBKT  &kp FSLH   &kp RSHIFT
                       &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def      &kp SPACE &trans   &kp DOT    &BOT
             >;
             sensor-bindings = <&inc_dec_kp C_NEXT C_PREV &inc_dec_kp C_VOL_DN C_VOL_UP>;
@@ -192,7 +192,7 @@
 &kp ESC     &kp F1    &kp F2     &kp F3    &kp F4    &kp F5           &bt BT_CLR                   &bt BT_CLR             &none     &none     &kp KP_DIVIDE   &kp KP_MULTIPLY &kp KP_MINUS &kp BSPC
 &kp TAB     &trans    &kp UP     &trans    &trans    &out OUT_TOG                                                          &none     &kp KP_N7  &kp KP_N8       &kp KP_N9       &kp KP_PLUS  &kp BSLH
 &kp CAPS    &kp LEFT  &kp DOWN   &kp RIGHT &trans    &trans           &mkp LCLK                    &mkp LCLK              &none     &kp KP_N4 &kp KP_N5       &kp KP_N6       &none        &kp ENTER
-&kp LSHFT   &trans    &trans     &trans    &trans    &kbl 0  &trans      &trans           &to_def  &to_def        &none     &kp KP_N1 &kp KP_N2       &kp KP_N3       &none        &kp RSHIFT
+&kp LSHFT   &trans    &trans     &trans    &trans    &rgb_ug RGB_TOG  &trans      &trans           &to_def  &to_def        &none     &kp KP_N1 &kp KP_N2       &kp KP_N3       &none        &kp RSHIFT
                       &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE        &to_def                                &to_def       &kp SPACE &kp KP_N0 &kp EQUAL    &kp KP_DOT
             >;
         };
