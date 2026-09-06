@@ -13,6 +13,8 @@
 #include <zmk/rgb_underglow.h>
 #include <zmk/backlight.h>
 
+#include "keyboard_backlight_control.h"
+
 LOG_MODULE_REGISTER(keyboard_backlight, CONFIG_ZMK_LOG_LEVEL);
 
 /* ==== Device ==== */
@@ -45,6 +47,7 @@ enum bl_state {
 
 static enum bl_state bl_state = BL_OFF;
 static int current_brt;
+static bool backlight_enabled;
 
 /* activity */
 static int64_t last_activity_ms;
@@ -74,6 +77,8 @@ static void set_brightness(int brt) {
     current_brt = brt;
 }
 
+static void trigger_activity(void);
+
 static void force_off(void) {
     bl_state = BL_OFF;
     set_brightness(MIN_BRT);
@@ -85,13 +90,7 @@ static void force_off(void) {
 static void bl_work_handler(struct k_work *work) {
     ARG_UNUSED(work);
 
-    bool rgb_on = true;
-
-#if IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
-    zmk_rgb_underglow_get_state(&rgb_on);
-#endif
-
-    if (!rgb_on) {
+    if (!backlight_enabled) {
         force_off();
         return;
     }
@@ -133,7 +132,7 @@ static void bl_work_handler(struct k_work *work) {
 static void trigger_activity(void) {
     last_activity_ms = k_uptime_get();
 
-    if (!device_is_ready(backlight_dev))
+    if (!backlight_enabled || !device_is_ready(backlight_dev))
         return;
 
     if (bl_state == BL_OFF || bl_state == BL_FADING_DOWN) {
@@ -144,6 +143,23 @@ static void trigger_activity(void) {
     int timeout = AUTO_OFF_MIN_MS;
 
     k_work_reschedule(&idle_off_work, K_MSEC(timeout));
+}
+
+bool keyboard_backlight_is_enabled(void) { return backlight_enabled; }
+
+void keyboard_backlight_activity(void) { trigger_activity(); }
+
+void keyboard_backlight_set_enabled(bool enabled) {
+    backlight_enabled = enabled;
+
+    if (!enabled) {
+        k_work_cancel_delayable(&idle_off_work);
+        k_work_cancel_delayable(&bl_work);
+        force_off();
+        return;
+    }
+
+    trigger_activity();
 }
 
 /* =========================================================
@@ -221,7 +237,14 @@ static int keyboard_backlight_init(void) {
     set_brightness(current_brt);
 
     last_activity_ms = k_uptime_get();
-    last_rgb_on = true;
+    last_rgb_on = false;
+    backlight_enabled = false;
+
+#if IS_ENABLED(CONFIG_ZMK_RGB_UNDERGLOW)
+    if (zmk_rgb_underglow_get_state(&last_rgb_on) == 0) {
+        backlight_enabled = last_rgb_on;
+    }
+#endif
 
     k_work_init_delayable(&bl_work, bl_work_handler);
     k_work_init_delayable(&idle_off_work, idle_off_handler);
@@ -231,12 +254,12 @@ static int keyboard_backlight_init(void) {
     /* ⭐ 启动 WPM */
     k_work_schedule(&wpm_work, K_SECONDS(1));
 
-    /* ⭐ 开机：先亮 */
-    bl_state = BL_FADING_UP;
-    k_work_schedule(&bl_work, K_NO_WAIT);
-
-    /* ⭐ 延迟自动灭（模拟 boot fade）*/
-    k_work_schedule(&idle_off_work, K_MSEC(BOOT_FADE_DELAY_MS));
+    /* If the saved backlight mode is ON, preserve the existing boot preview. */
+    if (backlight_enabled) {
+        bl_state = BL_FADING_UP;
+        k_work_schedule(&bl_work, K_NO_WAIT);
+        k_work_schedule(&idle_off_work, K_MSEC(BOOT_FADE_DELAY_MS));
+    }
 
     LOG_INF("Keyboard backlight EVENT-driven (no polling) initialized");
     return 0;
