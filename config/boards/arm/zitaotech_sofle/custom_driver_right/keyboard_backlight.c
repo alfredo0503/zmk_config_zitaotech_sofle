@@ -27,8 +27,8 @@ static const struct device *const backlight_dev = DEVICE_DT_GET(KEYBOARD_BACKLIG
 #define FADE_INTERVAL_MS 60
 
 #define BOOT_FADE_DELAY_MS 3000
-#define AUTO_OFF_MIN_MS 1000
-#define AUTO_OFF_MAX_MS 3000
+#define AUTO_OFF_MIN_MS 30000
+#define AUTO_OFF_MAX_MS 30000
 
 /* ==== WPM ==== */
 #define CHARS_PER_WORD 5.0
