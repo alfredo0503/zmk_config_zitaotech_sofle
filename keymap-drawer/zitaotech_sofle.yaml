@@ -131,7 +131,7 @@ layers:
   - '&to_def'
   - '&to_def'
   - SPACE
-  - {t: ▽, type: trans}
+  - _
   - .
   - '&bootloader'
   RAISE NUMPAD:
