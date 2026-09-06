@@ -113,7 +113,7 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&kbl'
+  - RGB TOG
   - BT PRV
   - BT NXT
   - '&bl BL_DEC'
@@ -180,7 +180,7 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '&kbl'
+  - RGB TOG
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - '&to_def'
